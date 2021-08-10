@@ -27,7 +27,6 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     if cmd[0] not in ('!', '！'):
         return 0
     args = cmd[1:].strip().split()  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
-    logger.debug(f'处理后的命令为: ↓\n{args}')
 
     if args[1].lower() == 'roll':
         await app.sendGroupMessage(group, MessageChain(__root__=[
