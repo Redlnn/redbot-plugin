@@ -32,8 +32,8 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     cmd: str = message.asDisplay().strip()  # 如 "!BV1S64y1W7ej" 或 "!av762147945"
     if cmd[0] not in ('!', '！'):
         return 0
-    origin_id = cmd[1:].strip()
-    # origin_id = cmd.strip()
+    origin_id: str = cmd[1:].strip()
+    # origin_id: str = cmd.strip()
     id_type = None
     if regex.match(avid_re, origin_id):
         id_type = 0
