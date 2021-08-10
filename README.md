@@ -8,4 +8,5 @@
 ## 插件列表
 1. [随机整数](./roll_number.py)
 2. [查询B站视频信息](./bilibili_video_info.py)
-3. ...
+3. [我的世界中文Wiki搜索](./search_minecraft_wiki.py)
+4. ...

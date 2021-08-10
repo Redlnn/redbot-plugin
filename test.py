@@ -24,7 +24,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
     if cmd[0] not in ('!', '！'):
         return 0
-    args: tuple = cmd[1:].strip().split()  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
+    args: list = cmd[1:].strip().split()  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
     logger.info(f'处理后的命令为: ↓\n{args}')
 
     message_id = await app.sendGroupMessage(group, MessageChain.create([Plain('Test')]))
