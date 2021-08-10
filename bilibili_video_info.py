@@ -84,6 +84,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
 av号：av{video_avid}
 标题：{video_title}'''
 
+    video_desc = video_desc.split('\n', 1)[0]
     if len(video_desc) > 30:
         info_text += f'\n简介：{video_desc[:30]}...\n'
     else:
