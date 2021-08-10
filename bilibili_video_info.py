@@ -80,8 +80,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     video_coin = video_info['stat']['coin']
     video_favorite = video_info['stat']['favorite']
 
-    info_text = f'''链接：https://www.bilibili.com/video/{video_bvid}
-BV号：{video_bvid}
+    info_text = f'''BV号：{video_bvid}
 av号：av{video_avid}
 标题：{video_title}'''
 
@@ -97,7 +96,8 @@ av号：av{video_avid}
 UP主：{video_up_name}
 发布时间：{video_pub_date}
 播放：{video_view} 弹幕：{video_danmu}
-点赞：{video_like} 投币：{video_coin} 收藏：{video_favorite}'''
+点赞：{video_like} 投币：{video_coin} 收藏：{video_favorite}
+链接：https://www.bilibili.com/video/{video_bvid}'''
     try:
         await app.sendGroupMessage(group, MessageChain.create([
             Image.fromNetworkAddress(video_cover_url), Plain(info_text)
