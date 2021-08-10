@@ -81,8 +81,8 @@ BV号：{video_bvid}
 av号：av{video_avid}
 标题：{video_title}'''
 
-        if len(video_desc) > 20:
-            info_text += f'\n简介：{video_desc[:20]}...\n'
+        if len(video_desc) > 30:
+            info_text += f'\n简介：{video_desc[:30]}...\n'
         else:
             info_text += f'\n简介：{video_desc}\n'
 
