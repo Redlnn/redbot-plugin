@@ -8,12 +8,12 @@
 """
 
 import logging
-from graia.application.message.elements.internal import Image
-
-import regex
 import time
 from json import loads
+
+import regex
 from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain)
+from graia.application.message.elements.internal import Image
 from requests import get
 
 from miraibot import GetCore
@@ -50,55 +50,59 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
 
     res_format = loads(res)
     if res_format['code'] != 0:
-        await app.sendGroupMessage(group, MessageChain.create([Plain(f'B站服务器返回错误：↓\n错误代码：{res_format["code"]}\n错误信息：{res_format["message"]}')]))
+        await app.sendGroupMessage(group, MessageChain.create([
+            Plain(f'B站服务器返回错误：↓\n错误代码：{res_format["code"]}\n错误信息：{res_format["message"]}')]
+        ))
+        logger.error(f'B站服务器返回错误：↓\n错误代码：{res_format["code"]}\n错误信息：{res_format["message"]}')
+        return 0
+
+    video_info = res_format['data']
+
+    video_cover_url = video_info['pic']
+    video_bvid = video_info['bvid']
+    video_avid = video_info['aid']
+    video_title = video_info['title']
+    video_sub_num = video_info['videos']
+    video_pub_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(video_info['pubdate']))
+    video_desc = video_info['desc']
+    video_duration_s = video_info['duration']
+    video_length_m, video_length_s = divmod(video_duration_s, 60)
+    video_length_h, video_length_m = divmod(video_length_m, 60)
+    if video_length_h == 0:
+        video_length = f'{video_length_m}:{video_length_s}'
     else:
-        video_info = res_format['data']
+        video_length = f'{video_length_h}:{video_length_m}:{video_length_s}'
+    # video_up_mid = video_info['owner']['mid']  # up主mid
+    video_up_name = video_info['owner']['name']
+    video_view = video_info['stat']['view']
+    video_danmu = video_info['stat']['danmaku']
+    video_like = video_info['stat']['like']
+    video_coin = video_info['stat']['coin']
+    video_favorite = video_info['stat']['favorite']
 
-        video_cover_url = video_info['pic']
-        video_bvid = video_info['bvid']
-        video_avid = video_info['aid']
-        video_title = video_info['title']
-        video_sub_num = video_info['videos']
-        video_pub_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(video_info['pubdate']))
-        video_desc = video_info['desc']
-        video_duration_s = video_info['duration']
-        video_length_m, video_length_s = divmod(video_duration_s, 60)
-        video_length_h, video_length_m = divmod(video_length_m, 60)
-        if video_length_h == 0:
-            video_length = f'{video_length_m}:{video_length_s}'
-        else:
-            video_length = f'{video_length_h}:{video_length_m}:{video_length_s}'
-        # video_up_mid = video_info['owner']['mid']
-        video_up_name = video_info['owner']['name']
-        video_view = video_info['stat']['view']
-        video_danmu = video_info['stat']['danmaku']
-        video_like = video_info['stat']['like']
-        video_coin = video_info['stat']['coin']
-        video_favorite = video_info['stat']['favorite']
-
-        info_text = f'''链接：https://www.bilibili.com/video/{video_bvid}
+    info_text = f'''链接：https://www.bilibili.com/video/{video_bvid}
 BV号：{video_bvid}
 av号：av{video_avid}
 标题：{video_title}'''
 
-        if len(video_desc) > 30:
-            info_text += f'\n简介：{video_desc[:30]}...\n'
-        else:
-            info_text += f'\n简介：{video_desc}\n'
+    if len(video_desc) > 30:
+        info_text += f'\n简介：{video_desc[:30]}...\n'
+    else:
+        info_text += f'\n简介：{video_desc}\n'
 
-        if video_sub_num > 1:
-            info_text += f'分P：{video_sub_num}\n'
+    if video_sub_num > 1:
+        info_text += f'分P：{video_sub_num}\n'
 
-        info_text += f'''时长：{video_length}
+    info_text += f'''时长：{video_length}
 UP主：{video_up_name}
 发布时间：{video_pub_date}
 播放：{video_view} 弹幕：{video_danmu}
 点赞：{video_like} 投币：{video_coin} 收藏：{video_favorite}'''
-        try:
-            await app.sendGroupMessage(group, MessageChain.create([
-                Image.fromNetworkAddress(video_cover_url), Plain(info_text)
-            ]))
-        except:  # noqa
-            await app.sendGroupMessage(group, MessageChain.create([
-                Plain(f'视频封面地址：{video_cover_url}\n' + info_text)
-            ]))
+    try:
+        await app.sendGroupMessage(group, MessageChain.create([
+            Image.fromNetworkAddress(video_cover_url), Plain(info_text)
+        ]))
+    except:  # noqa
+        await app.sendGroupMessage(group, MessageChain.create([
+            Plain(f'视频封面地址：{video_cover_url}\n' + info_text)
+        ]))
