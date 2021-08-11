@@ -15,14 +15,25 @@ from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain,
 
 from miraibot import GetCore
 
-bcc = GetCore.bcc()
-__plugin_name__ = __name__ = '随机整数'
+MODULE_NAME = '随机整数'
+MODULE_DESC = ''
+MODULE_AUTHOR = 'Red_lnn'
+MODULE_AUTHOR_CONTACT = 'https://github.com/Redlnn'
 
-logger = logging.getLogger(f'MiraiBot.{__name__}')
+bcc = GetCore.bcc()
+__plugin_name__ = __name__ = 'MODULE_NAME'
+
+logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
+
+# 生效的群组，若为空，即()，则在所有群组生效
+# 格式为：active_group = (123456, 456789, 789012)
+active_group = ()
 
 
 @bcc.receiver("GroupMessage")
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
+    if group.id not in active_group and active_group:
+        return 0
     cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
     if cmd[0] not in ('!', '！'):
         return 0

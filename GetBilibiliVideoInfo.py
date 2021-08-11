@@ -18,10 +18,19 @@ from requests import get
 
 from miraibot import GetCore
 
-bcc = GetCore.bcc()
-__plugin_name__ = __name__ = '获取B站视频信息'
+MODULE_NAME = '获取B站视频信息'
+MODULE_DESC = ''
+MODULE_AUTHOR = 'Red_lnn'
+MODULE_AUTHOR_CONTACT = 'https://github.com/Redlnn'
 
-logger = logging.getLogger(f'MiraiBot.{__name__}')
+bcc = GetCore.bcc()
+__plugin_name__ = __name__ = MODULE_NAME
+
+logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
+
+# 生效的群组，若为空，即()，则在所有群组生效
+# 格式为：active_group = (123456, 456789, 789012)
+active_group = ()
 
 avid_re = '^av[0-9]{1,}$'
 bvid_re = '^(BV|bv)(1)[0-9a-zA-Z]{2}(4)[1y]{1}(1)[0-9a-zA-Z]{1}(7)[0-9a-zA-Z]{2}$'
@@ -125,6 +134,8 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
 
 @bcc.receiver("GroupMessage")
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
+    if group.id not in active_group and active_group:
+        return 0
     if message.has(App):  # noqa
         app_json = message.get(App)[0].content  # noqa
         app_dict = json.loads(app_json)

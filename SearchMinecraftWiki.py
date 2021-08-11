@@ -17,17 +17,24 @@ from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain,
 
 from miraibot import GetCore
 
+MODULE_NAME = '我的世界中文Wiki搜索'
+MODULE_DESC = ''
+MODULE_AUTHOR = 'Red_lnn'
+MODULE_AUTHOR_CONTACT = 'https://github.com/Redlnn'
+
 bcc = GetCore.bcc()
-__plugin_name__ = __name__ = '我的世界中文Wiki搜索'
+__plugin_name__ = __name__ = MODULE_NAME
 
-logger = logging.getLogger(f'MiraiBot.{__name__}')
+logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 
-active_group = (175661873, 726324810, 885223928, 910301304)
+# 生效的群组，若为空，即()，则在所有群组生效
+# 格式为：active_group = (123456, 456789, 789012)
+active_group = ()
 
 
 @bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
-    if group.id not in active_group:
+    if group.id not in active_group and active_group:
         return 0
     cmd: str = message.asDisplay().strip()  # 如 "!BV1S64y1W7ej" 或 "!av762147945"
     if cmd[0] not in ('!', '！'):
