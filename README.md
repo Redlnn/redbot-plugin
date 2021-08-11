@@ -6,7 +6,7 @@
 2. `git clone git@github.com:Redlnn/redbot-plugin.git plugins`
 
 ## 插件列表
-1. [随机整数](./roll_number.py)
-2. [查询B站视频信息](./bilibili_video_info.py)
-3. [我的世界中文Wiki搜索](./search_minecraft_wiki.py)
+1. [随机整数](./RollNumber.py)
+2. [查询B站视频信息](./GetBilibiliVideoInfo.py)
+3. [我的世界中文Wiki搜索](./SearchMinecraftWiki.py)
 4. ...
