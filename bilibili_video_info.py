@@ -155,6 +155,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
         error_text = str(e)
         if error_text.startswith('B站服务器返回错误'):
             info_text = error_text
+            return 0
         else:
             return 0
 
