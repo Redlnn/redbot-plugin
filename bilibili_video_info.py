@@ -85,19 +85,19 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
 
     video_desc = video_desc.split('\n', 1)[0]
     if len(video_desc) > 25:
-        info_text += f'\n简介：{video_desc[:25]}...\n'
+        info_text += f'简介：{video_desc[:25]}...\n'
     else:
-        info_text += f'\n简介：{video_desc}\n'
+        info_text += f'简介：{video_desc}\n'
 
     if video_sub_num > 1:
         info_text += f'分P：{video_sub_num}\n'
 
-    info_text += f'时长：{video_length}\nUP主：{video_up_name}\n发布时间：{video_pub_date}'
+    info_text += f'时长：{video_length}\nUP主：{video_up_name}\n发布时间：{video_pub_date}\n'
     if int(video_view) > 9999:
         video_view = round(int(video_view) / 10000, 1)
-        info_text += f'\n播放：{video_view}万 '
+        info_text += f'播放：{video_view}万 '
     else:
-        info_text += f'\n播放：{video_view} '
+        info_text += f'播放：{video_view} '
     if int(video_danmu) > 9999:
         video_danmu = round(int(video_danmu) / 10000, 1)
         info_text += f'弹幕：{video_danmu}万\n'
