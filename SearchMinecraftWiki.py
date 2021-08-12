@@ -114,7 +114,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     msg_id1 = await app.sendGroupMessage(group, MessageChain.create([
         App(content=json.dumps(bilibili_wiki_json), type='App')
     ]))
-    sleep(round(uniform(0.3, 0.9), 2))
+    sleep(round(uniform(0.5, 1.3), 2))
     msg_id2 = await app.sendGroupMessage(group, MessageChain.create([
         App(content=json.dumps(fandom_gamepedia_wiki_json), type='App')
     ]))
