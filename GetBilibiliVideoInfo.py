@@ -139,17 +139,20 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     if message.has(App):  # noqa
         app_json = message.get(App)[0].content  # noqa
         app_dict = json.loads(app_json)
-        app_id = app_dict['meta']['detail_1']['appid']
-        if app_id == '1109937557':
-            b23_url_with_other = app_dict['meta']['detail_1']['qqdocurl']
-            try:
-                b23_url = regex.match('^(http|https)://b23.tv/[0-9a-zA-Z]*[?]', b23_url_with_other).group(0)[:-1]
-            except AttributeError:
+        try:
+            app_id = app_dict['meta']['detail_1']['appid']
+            if app_id == '1109937557':
+                b23_url_with_other = app_dict['meta']['detail_1']['qqdocurl']
+                try:
+                    b23_url = regex.match('^(http|https)://b23.tv/[0-9a-zA-Z]*[?]', b23_url_with_other).group(0)[:-1]
+                except AttributeError:
+                    return 0
+                res = requests.get(b23_url, allow_redirects=False)
+                bli_url_with_other = res.headers['Location']
+                origin_id = regex.search(bvid_re[1:-1], bli_url_with_other).group(0)  # 获得BV号
+            else:
                 return 0
-            res = requests.get(b23_url, allow_redirects=False)
-            bli_url_with_other = res.headers['Location']
-            origin_id = regex.search(bvid_re[1:-1], bli_url_with_other).group(0)  # 获得BV号
-        else:
+        except:  # noqa
             return 0
     elif message.has(Plain):  # noqa
         cmd: str = message.asDisplay().strip()  # 如 "!BV1S64y1W7ej" 或 "!av762147945"
