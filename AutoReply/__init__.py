@@ -27,7 +27,7 @@ if active_group is None:
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
         return 0
-    cmd: str = message.asDisplay()
+    cmd: str = message.asDisplay().strip()
     reply_dict = read_cfg()
     if reply_dict['normal'] is not None:
         for _ in dict(reply_dict['normal']).keys():
@@ -44,6 +44,6 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
                         Image.fromLocalFile(img_path)
                     ]))
                     if msg_id.messageId <= 0:
-                        logger.warning('发送图片消息失败')
+                        logger.warning('发送图片消息失败，可能是被QQ风控了，请不要使用敏感词')
                 finally:
                     os.remove(img_path)
