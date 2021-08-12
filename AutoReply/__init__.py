@@ -29,19 +29,21 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
         return 0
     cmd: str = message.asDisplay()
     reply_dict = read_cfg()
-    for _ in dict(reply_dict['normal']).keys():
-        if cmd.lower() == _:
-            await app.sendGroupMessage(group, MessageChain.create([
-                Plain(reply_dict['normal'][_])
-            ]), quote=message.get(Source).pop(0))  # noqa
-    for _ in dict(reply_dict['with_img']).keys():
-        if cmd.lower() == _:
-            img_path = generate_img(reply_dict['with_img'][_])
-            try:
-                msg_id = await app.sendGroupMessage(group, MessageChain.create([
-                    Image.fromLocalFile(img_path)
-                ]))
-                if msg_id.messageId <= 0:
-                    logger.warning('发送图片消息失败')
-            finally:
-                os.remove(img_path)
+    if reply_dict['normal'] is not None:
+        for _ in dict(reply_dict['normal']).keys():
+            if cmd.lower() == _:
+                await app.sendGroupMessage(group, MessageChain.create([
+                    Plain(reply_dict['normal'][_])
+                ]), quote=message.get(Source).pop(0))  # noqa
+    if reply_dict['with_img'] is not None:
+        for _ in dict(reply_dict['with_img']).keys():
+            if cmd.lower() == _:
+                img_path = generate_img(reply_dict['with_img'][_])
+                try:
+                    msg_id = await app.sendGroupMessage(group, MessageChain.create([
+                        Image.fromLocalFile(img_path)
+                    ]))
+                    if msg_id.messageId <= 0:
+                        logger.warning('发送图片消息失败')
+                finally:
+                    os.remove(img_path)
