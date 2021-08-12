@@ -1,0 +1,15 @@
+active_group:  # 此项下为要生效的群组，清空即为所有群组都生效
+# - 123456789
+# - 012345678
+
+text_to_img:  # 此项为文字生成图片相关
+  # 字体文件的文件名（带后缀名），支持ttf/otf/ttc/otc
+  # 字体文件请放在插件目录的fonts文件夹内，即【plugins/fonts/*.ttf】
+  font_name: OPPOSans.ttf
+  font_size: 30  # 字体大小
+  font_color: '#0E0E0E'  # 字体颜色，示例【#000000】
+  line_space: 10  # 行间距
+  left_margin: 60  # 左间距
+  right_margin: 60  # 右间距
+  top_margin: 90  # 上间距
+  bottom_margin: 90  # 下间距

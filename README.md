@@ -10,4 +10,5 @@
 2. [查询B站视频信息](./GetBilibiliVideoInfo.py)
 3. [我的世界中文Wiki搜索](./SearchMinecraftWiki.py)
 4. [自动回复-精确匹配](./AutoReply/)
-5. ...
+5. [文本转图片](./Text2Img/)
+6. ...
