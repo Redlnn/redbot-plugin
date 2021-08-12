@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import logging
+import os
 
 from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Source, Image)
-from miraibot import GetCore
 
-from .info import MODULE_NAME
+from miraibot import GetCore
 from .config import read_cfg
 from .gen_img import generate_img
+from .info import MODULE_NAME
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME
@@ -33,7 +33,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
         if cmd.lower() == _:
             await app.sendGroupMessage(group, MessageChain.create([
                 Plain(reply_dict['normal'][_])
-            ]), quote=message.get(Source).pop(0))
+            ]), quote=message.get(Source).pop(0))  # noqa
     for _ in dict(reply_dict['with_img']).keys():
         if cmd.lower() == _:
             img_path = generate_img(reply_dict['with_img'][_])
@@ -41,7 +41,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
                 msg_id = await app.sendGroupMessage(group, MessageChain.create([
                     Image.fromLocalFile(img_path)
                 ]))
-                if msg_id <= 0:
+                if msg_id.messageId <= 0:
                     logger.warning('发送图片消息失败')
             finally:
                 os.remove(img_path)

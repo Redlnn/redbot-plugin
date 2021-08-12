@@ -37,7 +37,6 @@ bvid_re = '^(BV|bv)(1)[0-9a-zA-Z]{2}(4)[1y]{1}(1)[0-9a-zA-Z]{1}(7)[0-9a-zA-Z]{2}
 
 
 async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = None, group: Group = None):
-    id_type = None
     if regex.match(avid_re, origin_id):
         id_type = 0
     elif regex.match(bvid_re, origin_id):
@@ -45,8 +44,6 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
     else:
         raise ValueError('不是av/BV号')
 
-    if id_type is None:
-        return 0
     if id_type == 0:
         url = f'http://api.bilibili.com/x/web-interface/view?aid={origin_id[2:]}'
     else:
@@ -59,7 +56,7 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
         await app.sendGroupMessage(group, MessageChain.create([
             Plain(error_text)]
         ))
-        logger.error(error_text)
+        logger.error(f'在请求{origin_id}的信息时，{error_text}')
         raise ValueError(error_text)
 
     video_info = res_format['data']
@@ -165,13 +162,8 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
 
     try:
         info_text, video_cover_url = await get_video_info(origin_id, app, group)
-    except ValueError as e:
-        error_text = str(e)
-        if error_text.startswith('B站服务器返回错误'):
-            info_text = error_text
-            return 0
-        else:
-            return 0
+    except ValueError:
+        return 0
 
     try:
         await app.sendGroupMessage(group, MessageChain.create([

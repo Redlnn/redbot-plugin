@@ -3,10 +3,10 @@
 
 import logging
 import os
-import regex
 import time
 
 import numpy as np
+import regex
 from PIL import Image, ImageDraw, ImageFont
 
 from .config import read_cfg
@@ -50,7 +50,8 @@ def __get_time(mode: int) -> str:
 
 
 def __is_cjk_char(char: str):
-    return True if regex.match(r'[\u2100-\u2BFF\u2E80-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF01-\uFF64\uFFE0-\uFFE7]', char) else False
+    return True if regex.match(r'[\u2100-\u2BFF\u2E80-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF01-\uFF64\uFFE0-\uFFE7]',
+                               char) else False
 
 
 def __cut_str2list(text, cut_len: int):
@@ -119,10 +120,12 @@ def generate_img(text: str) -> str:
     font = ImageFont.truetype(ttf_path, font_size)  # 确定生成图片用的ttf字体
     w, h = font.getsize(longest_text)  # 获取最长的那一行的宽高
     h += line_space  # 加入行距
-    bg = np.zeros((h * lines + top_margin + bottom_margin, w + h + left_margin + right_margin, 4), dtype=np.uint8)  # 根据所有行的总高度及最长一行的宽度生成画布的大小
+    bg = np.zeros((h * lines + top_margin + bottom_margin, w + h + left_margin + right_margin, 4),
+                  dtype=np.uint8)  # 根据所有行的总高度及最长一行的宽度生成画布的大小
     bg = Image.fromarray(bg)  # 生成绘图画布
     draw = ImageDraw.Draw(bg)
-    draw.rectangle([(0, 0), (w + h + left_margin + right_margin, h * lines + top_margin + bottom_margin)], (230, 230, 230))  # 绘制一个与画布等大的矩形作为背景
+    draw.rectangle([(0, 0), (w + h + left_margin + right_margin, h * lines + top_margin + bottom_margin)],
+                   (230, 230, 230))  # 绘制一个与画布等大的矩形作为背景
     for _ in range(len(text_list)):
         draw.text((h / 2 + left_margin, _ * h + top_margin), text_list[_], fill=font_color, font=font)  # 绘制每一行的内容
     bg = bg.convert(mode='RGB')  # 将RGBA转换为RGB以便保存为jpg

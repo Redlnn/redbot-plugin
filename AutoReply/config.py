@@ -4,6 +4,7 @@
 import logging
 import os
 import traceback
+
 from ruamel.yaml import YAML
 
 from .info import MODULE_NAME
@@ -57,8 +58,7 @@ def read_cfg():
     if not os.path.exists(os.path.join(os.path.dirname(__file__), 'config.yml')):  # 文件不存在
         write_cfg()
     try:
-        f = open(os.path.join(os.path.dirname(__file__),
-                 'config.yml'), mode='r', encoding='utf-8')
+        f = open(os.path.join(os.path.dirname(__file__), 'config.yml'), mode='r', encoding='utf-8')
         cfg_dict = yaml.load(f)
         f.close()
         logger.debug(f'配置文件内容: ↓\n{cfg_dict}')
