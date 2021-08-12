@@ -45,5 +45,8 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
                     ]))
                     if msg_id.messageId <= 0:
                         logger.warning('发送图片消息失败，可能是被QQ风控了，请不要使用敏感词')
+                        await app.sendGroupMessage(group, MessageChain.create([
+                            Plain('发送图片消息失败，可能是被QQ风控了，请不要使用敏感词')
+                        ]))
                 finally:
                     os.remove(img_path)
