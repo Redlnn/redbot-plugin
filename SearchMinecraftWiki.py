@@ -42,6 +42,8 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     args: list = cmd[1:].strip().split(' ', 1)
     if len(args) < 2:
         return 0
+    if args[0] != 'wiki':
+        return 0
     search_parm: str = quote(args[1], encoding='utf-8')
     bilibili_wiki_json = {
         'app': 'com.tencent.structmsg',
