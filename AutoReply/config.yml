@@ -13,7 +13,9 @@ with_img:  # 此项下的内容会生成图片来回复
     实在不行用换行符也行
 
 text_to_img:  # 此项为文字生成图片相关
-  font_name: OPPOSans.ttf  # 字体文件的文件名（带后缀名），支持ttf/otf/ttc/otc
+  # 字体文件的文件名（带后缀名），支持ttf/otf/ttc/otc
+  # 字体文件请放在插件目录的fonts文件夹内，即【plugins/fonts/*.ttf】
+  font_name: OPPOSans.ttf
   font_size: 30  # 字体大小
   font_color: '#0E0E0E'  # 字体颜色，示例【#000000】
   line_space: 10  # 行间距

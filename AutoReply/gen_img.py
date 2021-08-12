@@ -23,7 +23,9 @@ def __get_font_config():
 
     :return: ttf_path, font_size, font_color, line_space, left_margin, right_margin, top_margin, bottom_margin
     """
-    ttf_path: str = os.path.join(os.path.dirname(__file__), 'fonts', cfg['text_to_img']['font_name'])  # 字体文件的路径
+    ttf_path: str = os.path.join('fonts', cfg['text_to_img']['font_name'])  # 字体文件的路径
+    if not os.path.exists(ttf_path):
+        raise ValueError('文本转图片所用的字体文件不存在')
     font_size: int = cfg['text_to_img']['font_size']  # 字体大小
     font_color: str = cfg['text_to_img']['font_color']  # 字体颜色
     line_space: int = cfg['text_to_img']['line_space']  # 行间距
