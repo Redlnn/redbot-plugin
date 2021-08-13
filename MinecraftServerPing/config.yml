@@ -1,0 +1,5 @@
+active_group:  # 此项下为要生效的群组，清空即为所有群组都生效
+# - 123456789
+# - 012345678
+
+default_server: x.polars.cc:63401    # 默认情况Ping的服务器
