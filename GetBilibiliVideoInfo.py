@@ -129,7 +129,7 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
     return info_text, video_cover_url
 
 
-@bcc.receiver("GroupMessage")
+@bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
         return 0

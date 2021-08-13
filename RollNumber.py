@@ -30,7 +30,7 @@ logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 active_group = ()
 
 
-@bcc.receiver("GroupMessage")
+@bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
         return 0

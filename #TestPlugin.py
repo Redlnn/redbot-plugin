@@ -27,7 +27,7 @@ logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 active_group = ()
 
 
-@bcc.receiver("GroupMessage")
+@bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
         return 0
@@ -43,7 +43,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     # logger.info(f'本次发送的消息的ID为：{message_id.messageId}')
 
 
-@bcc.receiver("FriendMessage")
+@bcc.receiver('FriendMessage')
 async def friend_message_listener(app: GraiaMiraiApplication, friend: Friend, message: MessageChain):
     logger.info(f'接收到的消息链为: ↓\n{message}')
 
@@ -53,5 +53,5 @@ async def friend_message_listener(app: GraiaMiraiApplication, friend: Friend, me
     # args: list = cmd[1:].strip().split()  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
     # logger.info(f'处理后的命令为: ↓\n{args}')
 
-    # message_id = await app.sendGroupMessage(group, MessageChain.create([Plain('Test')]))
+    # message_id = await app.sendFriendMessage(frined, MessageChain.create([Plain('Test')]))
     # logger.info(f'本次发送的消息的ID为：{message_id.messageId}')
