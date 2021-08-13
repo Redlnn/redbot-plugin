@@ -55,19 +55,19 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
             motd += f'\n | {motd_list[1].strip()}'
         online_player = int(res['online_player'])
         if online_player == 0:
-            msg_send = f'咕咕咕！！！\n服务器版本: [{res["protocol"]}] {res["version"]}\nMOTD:\n{motd}'\
+            msg_send = f'咕咕咕！！！\n服务器版本: [{res["protocol"]}] {res["version"]}\nMOTD:\n{motd}' \
                        f'\n延迟: {res["delay"]}ms\n在线人数: {res["online_player"]}/{res["max_player"]}\nにゃ～'
         else:
             players_list = ''
             for _ in res['player_list']:
                 players_list += f' | {_[0]}\n'
             if online_player <= 10:
-                msg_send = f'咕咕咕！！！\n服务器版本: [{res["protocol"]}] {res["version"]}\nMOTD:\n{motd}'\
-                           f'\n延迟: {res["delay"]}ms\n在线人数: {res["online_player"]}/{res["max_player"]}\n'\
+                msg_send = f'咕咕咕！！！\n服务器版本: [{res["protocol"]}] {res["version"]}\nMOTD:\n{motd}' \
+                           f'\n延迟: {res["delay"]}ms\n在线人数: {res["online_player"]}/{res["max_player"]}\n' \
                            f'在线列表：\n{players_list}にゃ～'
             else:
-                msg_send = f'咕咕咕！！！\n服务器版本: [{res["protocol"]}] {res["version"]}\nMOTD:\n{motd}'\
-                           f'\n延迟: {res["delay"]}ms\n在线人数: {res["online_player"]}/{res["max_player"]}\n'\
+                msg_send = f'咕咕咕！！！\n服务器版本: [{res["protocol"]}] {res["version"]}\nMOTD:\n{motd}' \
+                           f'\n延迟: {res["delay"]}ms\n在线人数: {res["online_player"]}/{res["max_player"]}\n' \
                            f'在线列表（不完整）：\n{players_list}にゃ～'
 
         await app.sendGroupMessage(group, MessageChain.create([Plain(msg_send)]))
