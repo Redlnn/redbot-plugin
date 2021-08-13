@@ -13,4 +13,5 @@
 3. [我的世界中文Wiki搜索](./SearchMinecraftWiki.py)
 4. [自动回复-精确匹配](./AutoReply/)
 5. [文本转图片](./Text2Img/)
-6. ...
+6. [获取我的世界服务器信息](./MinecraftServerPing)
+7. ...
