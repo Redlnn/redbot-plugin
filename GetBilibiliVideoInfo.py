@@ -84,11 +84,11 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
     video_coin = video_info['stat']['coin']
     video_favorite = video_info['stat']['favorite']
 
-    info_text = f'BV号：{video_bvid}\nav号：av{video_avid}'
+    info_text = f'BV号：{video_bvid}\nav号：av{video_avid}\n'
     if len(video_title) > 20:
-        info_text += f'\n标题：{video_title[:20]}...\n'
+        info_text += f'标题：{video_title[:20]}...\n'
     else:
-        info_text += f'\n标题：{video_title}\n'
+        info_text += f'标题：{video_title}\n'
 
     video_desc = video_desc.split('\n', 1)[0]
     if len(video_desc) > 25:
@@ -96,35 +96,36 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
     else:
         info_text += f'简介：{video_desc}\n'
 
-    if video_sub_num > 1:
-        info_text += f'分P：{video_sub_num}\n'
+    info_text += f'UP主：{video_up_name}\n时长：{video_length}\n发布时间：{video_pub_date}\n'
 
-    info_text += f'时长：{video_length}\nUP主：{video_up_name}\n发布时间：{video_pub_date}\n'
+    if video_sub_num > 1:
+        info_text += f'分P数量：{video_sub_num}\n'
+
     if int(video_view) > 9999:
         video_view = round(int(video_view) / 10000, 1)
-        info_text += f'播放：{video_view}万 '
+        info_text += f'{video_view}万播放 '
     else:
-        info_text += f'播放：{video_view} '
+        info_text += f'{video_view}播放 '
     if int(video_danmu) > 9999:
         video_danmu = round(int(video_danmu) / 10000, 1)
-        info_text += f'弹幕：{video_danmu}万\n'
+        info_text += f'{video_danmu}万弹幕\n'
     else:
-        info_text += f'弹幕：{video_danmu}\n'
+        info_text += f'{video_danmu}弹幕\n'
     if int(video_like) > 9999:
         video_like = round(int(video_like) / 10000, 1)
-        info_text += f'点赞：{video_like}万 '
+        info_text += f'{video_like}万点赞 '
     else:
-        info_text += f'点赞：{video_like} '
+        info_text += f'{video_like}点赞 '
     if int(video_coin) > 9999:
         video_coin = round(int(video_coin) / 10000, 1)
-        info_text += f'投币：{video_coin}万 '
+        info_text += f'{video_coin}万投币 '
     else:
-        info_text += f'投币：{video_coin} '
+        info_text += f'{video_coin}投币 '
     if int(video_favorite) > 9999:
         video_favorite = round(int(video_favorite) / 10000, 1)
-        info_text += f'收藏：{video_favorite}万\n'
+        info_text += f'{video_favorite}万收藏\n'
     else:
-        info_text += f'收藏：{video_favorite}\n'
+        info_text += f'{video_favorite}收藏\n'
     info_text += f'链接：https://www.bilibili.com/video/{video_bvid}'
 
     return info_text, video_cover_url
