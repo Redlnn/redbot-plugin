@@ -13,8 +13,9 @@ import time
 
 import regex
 import requests
-from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Image, App)
+from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Image, App, Xml)
 from requests import get
+from xml.dom.minidom import parseString
 
 from miraibot import GetCore
 
@@ -32,14 +33,14 @@ logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 # 格式为：active_group = (123456, 456789, 789012)
 active_group = ()
 
-avid_re = '^av[0-9]{1,}$'
-bvid_re = '^(BV|bv)(1)[0-9a-zA-Z]{2}(4)[1y]{1}(1)[0-9a-zA-Z]{1}(7)[0-9a-zA-Z]{2}$'
+avid_re = '(av|AV)[0-9]{1,}'
+bvid_re = '(BV|bv)(1)[0-9a-zA-Z]{2}(4)[1y]{1}(1)[0-9a-zA-Z]{1}(7)[0-9a-zA-Z]{2}'
 
 
 async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = None, group: Group = None):
-    if regex.match(avid_re, origin_id):
+    if regex.match(f'^{avid_re}$', origin_id):
         id_type = 0
-    elif regex.match(bvid_re, origin_id):
+    elif regex.match(f'^{bvid_re}$', origin_id):
         id_type = 1
     else:
         raise ValueError('不是av/BV号')
@@ -138,25 +139,73 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
         app_dict = json.loads(app_json)
         try:
             app_id = app_dict['meta']['detail_1']['appid']
-            if app_id == '1109937557':
-                b23_url_with_other = app_dict['meta']['detail_1']['qqdocurl']
-                try:
-                    b23_url = regex.match('^(http|https)://b23.tv/[0-9a-zA-Z]*[?]', b23_url_with_other).group(0)[:-1]
-                except AttributeError:
-                    return 0
-                res = requests.get(b23_url, allow_redirects=False)
-                bli_url_with_other = res.headers['Location']
-                origin_id = regex.search(bvid_re[1:-1], bli_url_with_other).group(0)  # 获得BV号
-            else:
+        except KeyError:
+            try:
+                app_id = app_dict['meta']['news']['appid']
+            except:  # noqa
                 return 0
         except:  # noqa
             return 0
+
+        if int(app_id) == 1109937557:
+            b23_url = app_dict['meta']['detail_1']['qqdocurl']
+            # b23_url = regex.match('^(http|https)://b23.tv/[0-9a-zA-Z]*', b23_url).group(0)
+        elif int(app_id) == 1105517988:
+            b23_url = app_dict['meta']['news']['jumpUrl']
+            # b23_url = regex.match('^(http|https)://b23.tv/[0-9a-zA-Z]*', b23_url).group(0)
+        else:
+            return 0
+        res = requests.get(b23_url, allow_redirects=False)
+        bli_url = res.headers['Location']
+        origin_id = regex.search(bvid_re, bli_url)  # 获得BV号
+        if origin_id is None:
+            return 0
+        else:
+            origin_id = origin_id.group(0)
+    elif message.has(Xml):
+        xml_text = message.get(Xml)[0].xml
+        xml_tree = parseString(xml_text)
+        xml_collection = xml_tree.documentElement
+
+        if xml_collection.hasAttribute('url'):
+            xml_url = xml_collection.getAttribute('url')
+            if 'www.bilibili.com/video/' in xml_url:
+                origin_id = regex.search(bvid_re, xml_url)  # 获得BV号
+                if origin_id is None:
+                    origin_id = regex.search(avid_re, xml_url)  # 获得BV号
+                origin_id = origin_id.group(0)
+            elif 'b23.tv/' in xml_url:
+                res = requests.get(xml_url, allow_redirects=False)
+                bli_url = res.headers['Location']
+                origin_id = regex.search(bvid_re, bli_url)  # 获得BV号
+                if origin_id is None:
+                    return 0
+                else:
+                    origin_id = origin_id.group(0)
+        else:
+            return 0
     elif message.has(Plain):  # noqa
         cmd: str = message.asDisplay().strip()  # 如 "!BV1S64y1W7ej" 或 "!av762147945"
-        if cmd[0] not in ('!', '！'):
+        if 'www.bilibili.com/video/' in cmd:
+            origin_id = regex.search(bvid_re, cmd)  # 获得BV号
+            if origin_id is None:
+                origin_id = regex.search(avid_re, cmd)  # 获得BV号
+            if origin_id is None:
+                return 0
+            origin_id = origin_id.group(0)
+        elif 'b23.tv/' in cmd:
+            b23_url = regex.search('(http|https)://b23.tv/[0-9a-zA-Z]*', cmd).group(0)
+            res = requests.get(b23_url, allow_redirects=False)
+            bli_url = res.headers['Location']
+            origin_id = regex.search(bvid_re, bli_url)  # 获得BV号
+            if origin_id is None:
+                return 0
+            else:
+                origin_id = origin_id.group(0)
+        elif cmd[0] in ('!', '！'):
+            origin_id: str = cmd[1:].strip()
+        else:
             return 0
-        origin_id: str = cmd[1:].strip()
-        # origin_id: str = cmd.strip()
     else:
         return 0
 
