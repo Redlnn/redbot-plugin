@@ -10,12 +10,12 @@
 import json
 import logging
 import time
+from xml.dom.minidom import parseString
 
 import regex
 import requests
 from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Image, App, Xml)
 from requests import get
-from xml.dom.minidom import parseString
 
 from miraibot import GetCore
 
@@ -161,9 +161,9 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
         if origin_id is None:
             return 0
         else:
-            origin_id = origin_id.group(0)
-    elif message.has(Xml):
-        xml_text = message.get(Xml)[0].xml
+            origin_id = origin_id.group(0)  # noqa
+    elif message.has(Xml):  # noqa
+        xml_text = message.get(Xml)[0].xml  # noqa
         xml_tree = parseString(xml_text)
         xml_collection = xml_tree.documentElement
 
@@ -173,7 +173,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
                 origin_id = regex.search(bvid_re, xml_url)  # 获得BV号
                 if origin_id is None:
                     origin_id = regex.search(avid_re, xml_url)  # 获得BV号
-                origin_id = origin_id.group(0)
+                origin_id = origin_id.group(0)  # noqa
             elif 'b23.tv/' in xml_url:
                 res = requests.get(xml_url, allow_redirects=False)
                 bli_url = res.headers['Location']
@@ -181,7 +181,9 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
                 if origin_id is None:
                     return 0
                 else:
-                    origin_id = origin_id.group(0)
+                    origin_id = origin_id.group(0)  # noqa
+            else:
+                return 0
         else:
             return 0
     elif message.has(Plain):  # noqa
@@ -192,7 +194,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
                 origin_id = regex.search(avid_re, cmd)  # 获得BV号
             if origin_id is None:
                 return 0
-            origin_id = origin_id.group(0)
+            origin_id = origin_id.group(0)  # noqa
         elif 'b23.tv/' in cmd:
             b23_url = regex.search('(http|https)://b23.tv/[0-9a-zA-Z]*', cmd).group(0)
             res = requests.get(b23_url, allow_redirects=False)
@@ -201,7 +203,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
             if origin_id is None:
                 return 0
             else:
-                origin_id = origin_id.group(0)
+                origin_id = origin_id.group(0)  # noqa
         elif cmd[0] in ('!', '！'):
             origin_id: str = cmd[1:].strip()
         else:
