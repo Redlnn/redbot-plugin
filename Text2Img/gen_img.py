@@ -24,8 +24,10 @@ def __get_text_config() -> dict:
     font_name: str = cfg['text_to_img']['text_config']['font_name']
     ttf_path: str = os.path.join(os.getcwd(), 'plugins', 'fonts', font_name)  # 字体文件的路径
     if not os.path.exists(ttf_path):
-        raise ValueError(f'文本转图片所用的字体文件不存在，尝试访问的路径如下：↓\n{ttf_path}')
-    is_ttc_font: bool = True if font_name.endswith('ttc') or font_name.endswith('otc') else False
+        raise ValueError(f'文本转图片所用的字体文件不存在，请检查配置文件，尝试访问的路径如下：↓\n{ttf_path}')
+    if not font_name.endswith('.ttf') or not font_name.endswith('.otf'):
+        raise ValueError('所配置的字体文件名不正确，请检查配置文件')
+    is_ttc_font: bool = True if font_name.endswith('.ttc') or font_name.endswith('.otc') else False
     ttc_font_index: int = cfg['text_to_img']['text_config']['ttc_font_index']  # ttc/otc的字形索引号
     font_size: int = cfg['text_to_img']['text_config']['font_size']  # 字体大小
     font_color: str = cfg['text_to_img']['text_config']['font_color']  # 字体颜色
