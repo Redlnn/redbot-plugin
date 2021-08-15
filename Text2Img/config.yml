@@ -21,7 +21,7 @@ text_to_img:  # 此项为文字生成图片相关
     box_side_margin: 50  # 外框距左右边界距离
     box_top_margin: 70  # 外框距上边界距离
     box_bottom_margin: 250  # 外框距下边界距离
-    box_interval:  8  # 内外框距离
-    wrap_width: 8  # 小正方形边长
-    outline_width: 4  # 边框厚度
+    box_interval:  5  # 内外框距离
+    wrap_width: 5  # 小正方形边长
+    outline_width: 5  # 边框厚度
     outline_color: '#e9e5d9'  # 边框颜色

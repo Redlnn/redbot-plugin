@@ -43,13 +43,13 @@ def __get_text_config() -> dict:
         'margin': margin
     }
     # text_config = {
-    #     'ttf_path': os.path.join('OPPOSans'),
+    #     'ttf_path': r'',
+    #     'is_ttc_font': False,
+    #     'ttc_font_index': 1,
     #     'font_size': 50,
     #     'font_color': '#645647',
     #     'line_space': 30,
-    #     'side_margin': 80,
-    #     'top_margin': 80,
-    #     'bottom_margin': 80
+    #     'margin': 80
     # }
     return text_config
 
@@ -71,9 +71,9 @@ def __get_background_config() -> dict:
         'box_side_margin': box_side_margin,
         'box_top_margin': box_top_margin,
         'box_bottom_margin': box_bottom_margin,
-        'box_interval': box_interval,
-        'wrap_width': wrap_width,
-        'outline_width': outline_width,
+        'box_interval': box_interval + outline_width,
+        'wrap_width': wrap_width + 2 * outline_width,
+        'outline_width': outline_width,  # 内描边
         'outline_color': outline_color
     }
     # background_config = {
@@ -81,10 +81,10 @@ def __get_background_config() -> dict:
     #     'box_side_margin': 50,
     #     'box_top_margin': 70,
     #     'box_bottom_margin': 250,
-    #     'box_interval': 8,
-    #     'wrap_width': 8,
-    #     'outline_width': 4,
-    #     'outline_color': '#fffcf6'
+    #     'box_interval': 5,
+    #     'wrap_width': 5,
+    #     'outline_width': 5,  # 内描边
+    #     'outline_color': '#e9e5d9'
     # }
     return background_config
 
@@ -201,12 +201,13 @@ def generate_img(text: str = None) -> str:
     if longest_line_width < extra_text2_width:
         longest_line_width = int(extra_text2_width)  # 获取最长的那一行的宽
     line_height += text_config['line_space']  # 加入行距
-    # 画布高度 = ((行高 + 行距) * 行数) - 行距 + (2 * 正文边距) + (边框上边距 + 边框下边距 + 2 * 内外框距离)
+    # 画布高度=((行高+行距)*行数)-行距+(2*正文边距)+(边框上边距+4*边框厚度+2*内外框距离+边框下边距)
     bg_height = (line_height * lines) - text_config['line_space'] + (2 * text_config['margin']) + (
-            bg_config['box_top_margin'] + bg_config['box_bottom_margin'] + (2 * bg_config['box_interval']))
-    # 画布宽度 = 最长一行的宽度 + 2 * 正文侧面边距 + 2 * (边框侧面边距 + 内外框距离)
-    bg_width = longest_line_width + (2 * text_config['side_margin']) + (
-            2 * (bg_config['box_side_margin'] + bg_config['box_interval']))
+            bg_config['box_top_margin'] + (4 * bg_config['outline_width']) + (2 * bg_config['box_interval'])
+    ) + bg_config['box_bottom_margin']
+    # 画布宽度=最长一行的宽度+2*正文侧面边距+2*(边框侧面边距+(2*边框厚度)+内外框距离)
+    bg_width = longest_line_width + (2 * text_config['margin']) + (2 * (bg_config['box_side_margin'] + (
+            2 * bg_config['outline_width']) + bg_config['box_interval']))
     # 根据所有行的总高度及最长一行的宽度生成画布的大小
     bg_size = np.zeros((bg_height, bg_width, 4), dtype=np.uint8)
     canvas = Image.fromarray(bg_size)  # 生成绘图画布
@@ -225,54 +226,57 @@ def generate_img(text: str = None) -> str:
             (bg_width - bg_config['box_side_margin'], bg_height - bg_config['box_bottom_margin'])
         ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
     # 绘制内框
-    # 内框左上点坐标 x=边框侧边距+内外框距离 y=边框上边距+内外框距离
-    # 内框右下点坐标 x=画布宽度-边框侧边距-内外框距离 y=画布高度-边框上边距-内外框距离
+    # 内框左上点坐标 x=边框侧边距+外边框厚度+内外框距离 y=边框上边距+外边框厚度+内外框距离
+    # 内框右下点坐标 x=画布宽度-边框侧边距-外边框厚度-内外框距离 y=画布高度-边框上边距-外边框厚度-内外框距离
     draw.rectangle(
         (
-            (bg_config['box_side_margin'] + bg_config['box_interval'],
-             bg_config['box_top_margin'] + bg_config['box_interval']),
-            (bg_width - bg_config['box_side_margin'] - bg_config['box_interval'],
-             bg_height - bg_config['box_bottom_margin'] - bg_config['box_interval'])
+            (bg_config['box_side_margin'] + bg_config['outline_width'] + bg_config['box_interval'],
+             bg_config['box_top_margin'] + bg_config['outline_width'] + bg_config['box_interval']),
+            (bg_width - bg_config['box_side_margin'] - bg_config['outline_width'] - bg_config['box_interval'],
+             bg_height - bg_config['box_bottom_margin'] - bg_config['outline_width'] - bg_config['box_interval'])
         ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
+
+    pil_compensation = bg_config['outline_width']-1 if bg_config['outline_width'] > 1 else 0
+
     # 绘制左上小方形
-    # 左上点坐标 x=边框侧边距-边长-边框厚度-1 y=边框上边距-边长-边框厚度-1 (1用于补偿PIL绘图的错位)
-    # 右下点坐标 x=边框侧边距+边长-边框厚度-1 y=边框上边距+边长-边框厚度-1
+    # 左上点坐标 x=边框侧边距-边长-2*边框厚度+补偿 y=边框侧边距-边长-2*边框厚度+补偿 (补偿PIL绘图的错位)
+    # 右下点坐标 x=边框侧边距+补偿 y=边框上边距+补偿
     draw.rectangle(
         (
-            (bg_config['box_side_margin'] - bg_config['wrap_width'] - bg_config['outline_width'] - 1,
-             bg_config['box_top_margin'] - bg_config['wrap_width'] - bg_config['outline_width'] - 1),
-            (bg_config['box_side_margin'] + bg_config['wrap_width'] - bg_config['outline_width'] - 1,
-             bg_config['box_top_margin'] + bg_config['wrap_width'] - bg_config['outline_width'] - 1)
+            (bg_config['box_side_margin'] - bg_config['wrap_width'] - (2 * bg_config['outline_width']) + pil_compensation,  # noqa
+             bg_config['box_top_margin'] - bg_config['wrap_width'] - (2 * bg_config['outline_width']) + pil_compensation),  # noqa
+            (bg_config['box_side_margin'] + pil_compensation,
+             bg_config['box_top_margin'] + pil_compensation)
         ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
     # 绘制右上小方形
-    # 左上点坐标 x=画布宽度-边框侧边距-边框厚度+1 y=边框上边距-边长-边框厚度-1 (1用于补偿PIL绘图的错位)
-    # 右下点坐标 x=画布宽度-边框侧边距+边长+边框厚度+1 y=边框上边距+边长-边框厚度-1
+    # 左上点坐标 x=画布宽度-(边框侧边距+补偿) y=边框侧边距-边长-2*边框厚度+补偿 (补偿PIL绘图的错位)
+    # 右下点坐标 x=画布宽度-(边框侧边距-边长-2*边框厚度+补偿) y=边框上边距+补偿
     draw.rectangle(
         (
-            (bg_width - bg_config['box_side_margin'] - bg_config['outline_width'] + 1,
-             bg_config['box_top_margin'] - bg_config['wrap_width'] - bg_config['outline_width'] - 1),
-            (bg_width - bg_config['box_side_margin'] + bg_config['wrap_width'] + bg_config['outline_width'] + 1,
-             bg_config['box_top_margin'] + bg_config['wrap_width'] - bg_config['outline_width'] - 1)
+            (bg_width - bg_config['box_side_margin'] - pil_compensation,
+             bg_config['box_top_margin'] - bg_config['wrap_width'] - (2 * bg_config['outline_width']) + pil_compensation),  # noqa
+            (bg_width - bg_config['box_side_margin'] + bg_config['wrap_width'] + (2 * bg_config['outline_width'] - pil_compensation),  # noqa
+             bg_config['box_top_margin'] + pil_compensation)
         ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
     # 绘制左下小方形
-    # 左上点坐标 x=边框侧边距-边长-边框厚度-1 y=画布高度-边框下边距-边框厚度+1 (1用于补偿PIL绘图的错位)
-    # 右下点坐标 x=边框侧边距+边长-边框厚度-1 y=画布高度-边框下边距+边长+边框厚度+1
+    # 左上点坐标 x=边框侧边距-边长-2*边框厚度+补偿 y=画布高度-(边框下边距+补偿) (补偿PIL绘图的错位)
+    # 右下点坐标 x=边框侧边距+补偿 y=画布高度-(边框侧边距-边长-2*边框厚度+补偿)
     draw.rectangle(
         (
-            (bg_config['box_side_margin'] - bg_config['wrap_width'] - bg_config['outline_width'] - 1,
-             bg_height - bg_config['box_bottom_margin'] - bg_config['outline_width'] + 1),
-            (bg_config['box_side_margin'] + bg_config['wrap_width'] - bg_config['outline_width'] - 1,
-             bg_height - bg_config['box_bottom_margin'] + bg_config['wrap_width'] + bg_config['outline_width'] + 1)
+            (bg_config['box_side_margin'] - bg_config['wrap_width'] - (2 * bg_config['outline_width']) + pil_compensation,  # noqa
+             bg_height - bg_config['box_bottom_margin'] - pil_compensation),
+            (bg_config['box_side_margin'] + pil_compensation,
+             bg_height - bg_config['box_bottom_margin'] + bg_config['wrap_width'] + (2 * bg_config['outline_width']) - pil_compensation)  # noqa
         ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
     # 绘制右下小方形
-    # 左上点坐标 x=画布宽度-边框侧边距-边框厚度+1 y=画布高度-边框下边距-边框厚度+1 (1用于补偿PIL绘图的错位)
-    # 右下点坐标 x=画布宽度-边框侧边距+边长+边框厚度+1 y=画布高度-边框下边距+边长+边框厚度+1
+    # 左上点坐标 x=画布宽度-(边框侧边距+补偿) y=画布高度-(边框下边距+补偿) (补偿PIL绘图的错位)
+    # 右下点坐标 x=画布宽度-(边框侧边距-边长-2*边框厚度+补偿) y=画布高度-(边框侧边距-边长-2*边框厚度+补偿)
     draw.rectangle(
         (
-            (bg_width - bg_config['box_side_margin'] - bg_config['outline_width'] + 1,
-             bg_height - bg_config['box_bottom_margin'] - bg_config['outline_width'] + 1),
-            (bg_width - bg_config['box_side_margin'] + bg_config['wrap_width'] + bg_config['outline_width'] + 1,
-             bg_height - bg_config['box_bottom_margin'] + bg_config['wrap_width'] + bg_config['outline_width'] + 1)
+            (bg_width - bg_config['box_side_margin'] - pil_compensation,
+             bg_height - bg_config['box_bottom_margin'] - pil_compensation),
+            (bg_width - bg_config['box_side_margin'] + bg_config['wrap_width'] + (2 * bg_config['outline_width'] - pil_compensation),  # noqa
+             bg_height - bg_config['box_bottom_margin'] + bg_config['wrap_width'] + (2 * bg_config['outline_width']) - pil_compensation)  # noqa
         ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
 
     # 绘制正文文字
@@ -280,8 +284,8 @@ def generate_img(text: str = None) -> str:
     for _ in range(len(text_list)):
         draw.text(
             (
-                bg_config['box_side_margin'] + bg_config['box_interval'] + text_config['side_margin'],
-                bg_config['box_top_margin'] + bg_config['box_interval'] + text_config['margin'] + (_ * line_height)
+                bg_config['box_side_margin'] + (2 * bg_config['wrap_width']) + bg_config['box_interval'] + text_config['margin'],  # noqa
+                bg_config['box_top_margin'] + (2 * bg_config['wrap_width']) + bg_config['box_interval'] + text_config['margin'] + (_ * line_height)  # noqa
             ), text_list[_], fill=text_config['font_color'], font=font)
 
     # 绘制第一行额外文字
@@ -312,6 +316,10 @@ def generate_img(text: str = None) -> str:
     img_path = os.path.join(temp_dir_path, img_name)  # 自定义临时文件保存路径
     # 保存为图片 https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html?highlight=subsampling#jpeg
     canvas.save(img_path, format='JPEG', quality=95, optimize=True, progressive=True, subsampling=1, qtables='web_high')
+    # img_name = 'temp_{}.png'.format(__get_time(2))  # 自定义临时文件的保存名称
+    # img_path = os.path.join(temp_dir_path, img_name)  # 自定义临时文件保存路径
+    # 保存为图片 https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html?highlight=subsampling#png
+    # canvas.save(img_path, format='PNG', optimize=True)
     logger.debug(f'已生成图片并保存至: ↓\n{img_path}')
     return img_path
 
