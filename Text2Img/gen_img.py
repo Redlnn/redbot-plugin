@@ -21,16 +21,20 @@ def __get_text_config() -> dict:
     """
     获取正文配置
     """
-    ttf_path: str = os.path.join(os.getcwd(), 'plugins', 'fonts',
-                                 cfg['text_to_img']['text_config']['font_name'])  # 字体文件的路径
+    font_name: str = cfg['text_to_img']['text_config']['font_name']
+    ttf_path: str = os.path.join(os.getcwd(), 'plugins', 'fonts', font_name)  # 字体文件的路径
     if not os.path.exists(ttf_path):
         raise ValueError(f'文本转图片所用的字体文件不存在，尝试访问的路径如下：↓\n{ttf_path}')
+    is_ttc_font: bool = True if font_name.endswith('ttc') or font_name.endswith('otc') else False
+    ttc_font_index: int = cfg['text_to_img']['text_config']['ttc_font_index']  # ttc/otc的字形索引号
     font_size: int = cfg['text_to_img']['text_config']['font_size']  # 字体大小
     font_color: str = cfg['text_to_img']['text_config']['font_color']  # 字体颜色
     line_space: int = cfg['text_to_img']['text_config']['line_space']  # 行间距
     margin: int = cfg['text_to_img']['text_config']['margin']  # 上下左右距离内框的间距
     text_config = {
         'ttf_path': ttf_path,
+        'is_ttc_font': is_ttc_font,
+        'ttc_font_index': ttc_font_index,
         'font_size': font_size,
         'font_color': font_color,
         'line_space': line_space,
@@ -161,9 +165,18 @@ def generate_img(text: str = None) -> str:
     """
     text_config = __get_text_config()
     bg_config = __get_background_config()
-    font = ImageFont.truetype(text_config['ttf_path'], text_config['font_size'])  # 确定正文用的ttf字体
-    extra_font = ImageFont.truetype(text_config['ttf_path'],
-                                    text_config['font_size'] - int(0.3 * text_config['font_size']))  # 确定而额外文本用的ttf字体
+    if text_config['is_ttc_font']:
+        font = ImageFont.truetype(text_config['ttf_path'], size=text_config['font_size'],
+                                  index=text_config['ttc_font_index'])  # 确定正文用的ttf字体
+        extra_font = ImageFont.truetype(text_config['ttf_path'],
+                                        size=text_config['font_size'] - int(0.3 * text_config['font_size']),
+                                        index=text_config['ttc_font_index'])  # 确定而额外文本用的ttf字体
+    else:
+        # 确定正文用的ttf字体
+        font = ImageFont.truetype(text_config['ttf_path'], size=text_config['font_size'])
+        # 确定而额外文本用的ttf字体
+        extra_font = ImageFont.truetype(text_config['ttf_path'],
+                                        size=text_config['font_size'] - int(0.3 * text_config['font_size']))
     extra_text1 = '由 Red_lnn 的 Bot 生成'  # 额外文本1
     extra_text2 = __get_time()  # 额外文本2
     text_list = []

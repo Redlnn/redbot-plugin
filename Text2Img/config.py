@@ -21,8 +21,12 @@ text_to_img:  # 此项为文字生成图片相关
     # 字体文件的文件名（带后缀名），支持ttf/otf/ttc/otc
     # 字体文件请放在插件目录的fonts文件夹内，即【plugins/fonts/*.ttf】
     font_name: OPPOSans.ttf
+    # 若使用ttc/otc字体文件，则要加载的ttc/otc的字形索引号，不懂请填1
+    # 具体索引号可安装afdko后使用 `otc2otf -r {name}.ttc`查看
+    # afdko: https://github.com/adobe-type-tools/afdko
+    ttc_font_index: 1
     font_size: 50  # 字体大小
-    font_color: '#645647'  # 字体颜色，示例【#000000】
+    font_color: '#645647'  # 字体颜色
     line_space: 30  # 行间距
     margin: 80  # 上下左右距离内框的间距
 
