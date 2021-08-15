@@ -26,13 +26,15 @@ if active_group is None:
 @bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
-        return 0
+        return None
     cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
-    if cmd[0] not in ('!', '！'):
-        return 0
+    if len(cmd) == 0 or cmd[0] not in ('!', '！'):
+        return None
     args: list = cmd[1:].strip().split(' ', 1)  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
     if args[0] != 'img':
-        return 0
+        return None
+    if len(args) < 2:
+        return None
     img_path = generate_img(args[1])
     try:
         msg_id = await app.sendGroupMessage(group, MessageChain.create([

@@ -26,8 +26,10 @@ if active_group is None:
 @bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
-        return 0
+        return None
     cmd: str = message.asDisplay().strip()
+    if len(cmd) == 0:
+        return None
     reply_dict = read_cfg()
     if reply_dict['normal'] is not None:
         for _ in dict(reply_dict['normal']).keys():

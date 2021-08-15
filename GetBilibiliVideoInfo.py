@@ -134,7 +134,7 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
 @bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
-        return 0
+        return None
     if message.has(App):  # noqa
         app_json = message.get(App)[0].content  # noqa
         app_dict = json.loads(app_json)
@@ -144,9 +144,9 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
             try:
                 app_id = app_dict['meta']['news']['appid']
             except:  # noqa
-                return 0
+                return None
         except:  # noqa
-            return 0
+            return None
 
         if int(app_id) == 1109937557:
             b23_url = app_dict['meta']['detail_1']['qqdocurl']
@@ -155,12 +155,12 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
             b23_url = app_dict['meta']['news']['jumpUrl']
             # b23_url = regex.match('^(http|https)://b23.tv/[0-9a-zA-Z]*', b23_url).group(0)
         else:
-            return 0
+            return None
         res = requests.get(b23_url, allow_redirects=False)
         bli_url = res.headers['Location']
         origin_id = regex.search(bvid_re, bli_url)  # 获得BV号
         if origin_id is None:
-            return 0
+            return None
         else:
             origin_id = origin_id.group(0)  # noqa
     elif message.has(Xml):  # noqa
@@ -180,21 +180,23 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
                 bli_url = res.headers['Location']
                 origin_id = regex.search(bvid_re, bli_url)  # 获得BV号
                 if origin_id is None:
-                    return 0
+                    return None
                 else:
                     origin_id = origin_id.group(0)  # noqa
             else:
-                return 0
+                return None
         else:
-            return 0
+            return None
     elif message.has(Plain):  # noqa
         cmd: str = message.asDisplay().strip()  # 如 "!BV1S64y1W7ej" 或 "!av762147945"
+        if len(cmd) == 0:
+            return None
         if 'www.bilibili.com/video/' in cmd:
             origin_id = regex.search(bvid_re, cmd)  # 获得BV号
             if origin_id is None:
                 origin_id = regex.search(avid_re, cmd)  # 获得BV号
             if origin_id is None:
-                return 0
+                return None
             origin_id = origin_id.group(0)  # noqa
         elif 'b23.tv/' in cmd:
             b23_url = regex.search('(http|https)://b23.tv/[0-9a-zA-Z]*', cmd).group(0)
@@ -202,20 +204,20 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
             bli_url = res.headers['Location']
             origin_id = regex.search(bvid_re, bli_url)  # 获得BV号
             if origin_id is None:
-                return 0
+                return None
             else:
                 origin_id = origin_id.group(0)  # noqa
         elif cmd[0] in ('!', '！'):
             origin_id: str = cmd[1:].strip()
         else:
-            return 0
+            return None
     else:
-        return 0
+        return None
 
     try:
         info_text, video_cover_url = await get_video_info(origin_id, app, group)
     except ValueError:
-        return 0
+        return None
 
     try:
         await app.sendGroupMessage(group, MessageChain.create([

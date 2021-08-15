@@ -27,23 +27,23 @@ if active_group is None:
 @bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
-        return 0
+        return None
     cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
-    if cmd[0] not in ('!', '！'):
-        return 0
+    if len(cmd) == 0 or cmd[0] not in ('!', '！'):
+        return None
     args: list = cmd[1:].strip().split(' ')  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
     if args[0] != 'ping':
-        return 0
+        return None
     if len(args) == 1:
         server_address = cfg['default_server']
     elif len(args) == 2:
         if '://' in args[1]:
             await app.sendGroupMessage(group, MessageChain.create([Plain('不支持带有协议前缀的地址')]))
-            return 0
+            return None
         server_address = args[1]
     else:
         await app.sendGroupMessage(group, MessageChain.create([Plain('未知命令，请检查你的输入')]))
-        return 0
+        return None
 
     res = ping_client(server_address)
     if type(res) is str:

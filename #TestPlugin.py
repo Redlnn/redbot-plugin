@@ -30,12 +30,12 @@ active_group = ()
 @bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
-        return 0
+        return None
     logger.info(f'接收到的消息链为: ↓\n{message}')
 
     # cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
-    # if cmd[0] not in ('!', '！'):
-    #     return 0
+    # if len(cmd) == 0 or cmd[0] not in ('!', '！'):
+    #     return None
     # args: list = cmd[1:].strip().split()  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
     # logger.info(f'处理后的命令为: ↓\n{args}')
 
@@ -48,8 +48,8 @@ async def friend_message_listener(app: GraiaMiraiApplication, friend: Friend, me
     logger.info(f'接收到的消息链为: ↓\n{message}')
 
     # cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
-    # if cmd[0] not in ('!', '！'):
-    #     return 0
+    # if len(cmd) == 0 or cmd[0] not in ('!', '！'):
+    #     return None
     # args: list = cmd[1:].strip().split()  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
     # logger.info(f'处理后的命令为: ↓\n{args}')
 
