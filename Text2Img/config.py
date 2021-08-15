@@ -17,16 +17,24 @@ active_group:  # 此项下为要生效的群组，清空即为所有群组都生
 # - 012345678
 
 text_to_img:  # 此项为文字生成图片相关
-  # 字体文件的文件名（带后缀名），支持ttf/otf/ttc/otc
-  # 字体文件请放在插件目录的fonts文件夹内，即【plugins/fonts/*.ttf】
-  font_name: OPPOSans.ttf
-  font_size: 30  # 字体大小
-  font_color: '#0E0E0E'  # 字体颜色，示例【#000000】
-  line_space: 10  # 行间距
-  left_margin: 60  # 左间距
-  right_margin: 60  # 右间距
-  top_margin: 90  # 上间距
-  bottom_margin: 90  # 下间距
+  text_config:  # 正文配置
+    # 字体文件的文件名（带后缀名），支持ttf/otf/ttc/otc
+    # 字体文件请放在插件目录的fonts文件夹内，即【plugins/fonts/*.ttf】
+    font_name: OPPOSans.ttf
+    font_size: 50  # 字体大小
+    font_color: '#645647'  # 字体颜色，示例【#000000】
+    line_space: 30  # 行间距
+    margin: 80  # 上下左右距离内框的间距
+
+  background_config:  # 背景设置
+    background_color: '#fffcf6'  # 背景颜色
+    box_side_margin: 50  # 外框距左右边界距离
+    box_top_margin: 70  # 外框距上边界距离
+    box_bottom_margin: 250  # 外框距下边界距离
+    box_interval:  8  # 内外框距离
+    wrap_width: 8  # 小正方形边长
+    outline_width: 4  # 边框厚度
+    outline_color: '#e9e5d9'  # 边框颜色
 """
 
 yaml = YAML()
