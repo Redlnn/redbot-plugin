@@ -37,7 +37,7 @@ text_to_img:  # 此项为文字生成图片相关
     box_bottom_margin: 250  # 外框距下边界距离
     box_interval:  5  # 内外框距离
     wrap_width: 5  # 小正方形边长
-    outline_width: 5  # 边框厚度
+    outline_width: 5  # 边框内描边厚度
     outline_color: '#e9e5d9'  # 边框颜色
 """
 

@@ -64,16 +64,16 @@ def __get_background_config() -> dict:
     box_bottom_margin: int = cfg['text_to_img']['background_config']['box_bottom_margin']  # 外框距下边界距离
     box_interval: int = cfg['text_to_img']['background_config']['box_interval']  # 内外框距离
     wrap_width: int = cfg['text_to_img']['background_config']['wrap_width']  # 小正方形边长
-    outline_width: int = cfg['text_to_img']['background_config']['outline_width']  # 边框厚度
+    outline_width: int = cfg['text_to_img']['background_config']['outline_width']  # 边框内描边厚度
     outline_color: str = cfg['text_to_img']['background_config']['outline_color']  # 边框颜色
     background_config = {
         'background_color': background_color,
         'box_side_margin': box_side_margin,
         'box_top_margin': box_top_margin,
         'box_bottom_margin': box_bottom_margin,
-        'box_interval': box_interval + outline_width,
-        'wrap_width': wrap_width + 2 * outline_width,
-        'outline_width': outline_width,  # 内描边
+        'box_interval': box_interval,
+        'wrap_width': wrap_width,
+        'outline_width': outline_width,
         'outline_color': outline_color
     }
     # background_config = {
@@ -280,12 +280,12 @@ def generate_img(text: str = None) -> str:
         ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
 
     # 绘制正文文字
-    # 开始坐标 x=边框侧边距+内外框距离+正文侧边距 y=边框上边距+内外框距离+正文上边距+行号*(行高+行距)
+    # 开始坐标 x=边框侧边距+2*边框厚度+内外框距离+正文侧边距 y=边框上边距+2*边框厚度+内外框距离+正文上边距+行号*(行高+行距)
     for _ in range(len(text_list)):
         draw.text(
             (
-                bg_config['box_side_margin'] + (2 * bg_config['wrap_width']) + bg_config['box_interval'] + text_config['margin'],  # noqa
-                bg_config['box_top_margin'] + (2 * bg_config['wrap_width']) + bg_config['box_interval'] + text_config['margin'] + (_ * line_height)  # noqa
+                bg_config['box_side_margin'] + (2 * bg_config['outline_width']) + bg_config['box_interval'] + text_config['margin'],  # noqa
+                bg_config['box_top_margin'] + (2 * bg_config['outline_width']) + bg_config['box_interval'] + text_config['margin'] + (_ * line_height)  # noqa
             ), text_list[_], fill=text_config['font_color'], font=font)
 
     # 绘制第一行额外文字
