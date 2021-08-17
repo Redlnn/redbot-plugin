@@ -38,7 +38,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
     if len(cmd) == 0 or cmd[0] not in ('!', '！'):
         return None
 
-    if cmd.startswith('roll'):
+    if cmd[1:4] == 'roll':
         await app.sendGroupMessage(group, MessageChain(__root__=[
             Plain(str(randint(0, 100)))
         ]), quote=message.get(Source).pop(0))  # noqa
