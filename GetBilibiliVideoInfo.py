@@ -34,24 +34,24 @@ logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 active_group = ()
 
 avid_re = '(av|AV)[0-9]{1,}'
-bvid_re = '(BV|bv)(1)[0-9a-zA-Z]{2}(4)[1y]{1}(1)[0-9a-zA-Z]{1}(7)[0-9a-zA-Z]{2}'
+bvid_re = '[Bb][Vv]1([0-9a-zA-Z]{2})4[1y]1[0-9a-zA-Z]7([0-9a-zA-Z]{2})'
 
 
 async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = None, group: Group = None):
     if regex.match(f'^{avid_re}$', origin_id):
-        id_type = 0
+        id_type = 'av'
     elif regex.match(f'^{bvid_re}$', origin_id):
-        id_type = 1
+        id_type = 'bv'
     else:
         raise ValueError('不是av/BV号')
 
-    if id_type == 0:
+    if id_type == 'av':
         url = f'http://api.bilibili.com/x/web-interface/view?aid={origin_id[2:]}'
     else:
         url = f'http://api.bilibili.com/x/web-interface/view?bvid={origin_id}'
-    res = get(url).text
+    res = get(url).text  # B站api返回json文本
 
-    res_format = json.loads(res)
+    res_format = json.loads(res)  # 读取json文本为dict对象
     if res_format['code'] != 0:
         error_text = f'B站服务器返回错误：↓\n错误代码：{res_format["code"]}\n错误信息：{res_format["message"]}'
         await app.sendGroupMessage(group, MessageChain.create([
@@ -60,72 +60,48 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
         logger.error(f'在请求{origin_id}的信息时，{error_text}')
         raise ValueError(error_text)
 
-    video_info = res_format['data']
+    video_info: dict = res_format['data']  # 若错误代码为0，则读取视频信息
 
-    video_cover_url = video_info['pic']
-    video_bvid = video_info['bvid']
-    video_avid = video_info['aid']
-    video_title = video_info['title']
-    video_sub_num = video_info['videos']
-    video_pub_date = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(video_info['pubdate']))
-    video_desc = video_info['desc']
-    video_duration_s = video_info['duration']
-    video_length_m, video_length_s = divmod(video_duration_s, 60)
+    video_cover_url: str = video_info['pic']   # 封面地址
+    video_bvid: str = video_info['bvid']       # BV号
+    video_avid: int = video_info['aid']        # av号
+    video_title: str = video_info['title']     # 视频标题
+    video_sub_num: int = video_info['videos']  # 视频分P数
+    video_pub_date: int = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(video_info['pubdate']))  # 视频发布时间(时间戳)
+    # video_unload_date: int = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(video_info['ctime']))  # 视频上传时间(时间戳)
+    video_desc: str = video_info['desc']  # 视频简介
+    video_duration_s: int = video_info['duration']  # 视频长度（单位：秒）
+    video_length_m, video_length_s = divmod(video_duration_s, 60)  # 将总的秒数转换为时分秒格式
     video_length_h, video_length_m = divmod(video_length_m, 60)
     if video_length_h == 0:
         video_length = f'{video_length_m}:{video_length_s}'
     else:
         video_length = f'{video_length_h}:{video_length_m}:{video_length_s}'
     # video_up_mid = video_info['owner']['mid']  # up主mid
-    video_up_name = video_info['owner']['name']
-    video_view = video_info['stat']['view']
-    video_danmu = video_info['stat']['danmaku']
-    video_like = video_info['stat']['like']
-    video_coin = video_info['stat']['coin']
-    video_favorite = video_info['stat']['favorite']
+    video_up_name: int = video_info['owner']['name']  # up主名称
+    video_view: int = video_info['stat']['view']      # 播放量
+    video_danmu: int = video_info['stat']['danmaku']  # 弹幕量
+    video_like: int = video_info['stat']['like']      # 点赞量
+    video_coin: int = video_info['stat']['coin']      # 投币量
+    video_favorite: int = video_info['stat']['favorite']  # 收藏量
 
-    info_text = f'BV号：{video_bvid}\nav号：av{video_avid}\n'
-    if len(video_title) > 20:
-        info_text += f'标题：{video_title[:20]}...\n'
-    else:
-        info_text += f'标题：{video_title}\n'
+    video_desc: str = video_desc.split('\n', 1)[0]  # 简介只取第一行，提前处理方便格式化
 
-    video_desc = video_desc.split('\n', 1)[0]
-    if len(video_desc) > 25:
-        info_text += f'简介：{video_desc[:25]}...\n'
-    else:
-        info_text += f'简介：{video_desc}\n'
-
-    info_text += f'UP主：{video_up_name}\n时长：{video_length}\n发布时间：{video_pub_date}\n'
-
+    info_text = f'''\
+BV号：{video_bvid}
+av号：av{video_avid}
+标题：{video_title[:20] if len(video_title) > 20 else video_title}
+简介：{video_desc[:25] + "..." if len(video_desc) > 25 else video_desc}
+UP主：{video_up_name}
+时长：{video_length}
+发布时间：{video_pub_date}'''
     if video_sub_num > 1:
         info_text += f'分P数量：{video_sub_num}\n'
-
-    if int(video_view) > 9999:
-        video_view = round(int(video_view) / 10000, 1)
-        info_text += f'{video_view}万播放 '
-    else:
-        info_text += f'{video_view}播放 '
-    if int(video_danmu) > 9999:
-        video_danmu = round(int(video_danmu) / 10000, 1)
-        info_text += f'{video_danmu}万弹幕\n'
-    else:
-        info_text += f'{video_danmu}弹幕\n'
-    if int(video_like) > 9999:
-        video_like = round(int(video_like) / 10000, 1)
-        info_text += f'{video_like}万点赞 '
-    else:
-        info_text += f'{video_like}点赞 '
-    if int(video_coin) > 9999:
-        video_coin = round(int(video_coin) / 10000, 1)
-        info_text += f'{video_coin}万投币 '
-    else:
-        info_text += f'{video_coin}投币 '
-    if int(video_favorite) > 9999:
-        video_favorite = round(int(video_favorite) / 10000, 1)
-        info_text += f'{video_favorite}万收藏\n'
-    else:
-        info_text += f'{video_favorite}收藏\n'
+    info_text += f'{video_view if int(video_view) < 9999 else round(int(video_view) / 10000, 1)}万播放 '
+    info_text += f'{video_danmu if int(video_danmu) < 9999 else round(int(video_danmu) / 10000, 1)}万弹幕\n'
+    info_text += f'{video_like if int(video_like) < 9999 else round(int(video_like) / 10000, 1)}万点赞 '
+    info_text += f'{video_coin if int(video_coin) < 9999 else round(int(video_coin) / 10000, 1)}万投币 '
+    info_text += f'{video_favorite if int(video_favorite) < 9999 else round(int(video_favorite) / 10000, 1)}万收藏\n'
     info_text += f'链接：https://www.bilibili.com/video/{video_bvid}'
 
     return info_text, video_cover_url
@@ -199,8 +175,8 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
                 return None
             origin_id = origin_id.group(0)  # noqa
         elif 'b23.tv/' in cmd:
-            b23_url = regex.search('(http|https)://b23.tv/[0-9a-zA-Z]*', cmd).group(0)
-            res = requests.get(b23_url, allow_redirects=False)
+            b23_url = regex.search('b23.tv/[0-9a-zA-Z]*', cmd).group(0)  # 去除多余的类似 "?shareFrom=xxx" 的内容
+            res = requests.get(f'https://{b23_url}', allow_redirects=False)  # 获得重定向后的B站地址
             bli_url = res.headers['Location']
             origin_id = regex.search(bvid_re, bli_url)  # 获得BV号
             if origin_id is None:
@@ -208,7 +184,11 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
             else:
                 origin_id = origin_id.group(0)  # noqa
         elif cmd[0] in ('!', '！'):
-            origin_id: str = cmd[1:].strip()
+            args = cmd[1:].split()
+            if len(args) > 1:
+                return None
+            elif args[0].lower().startswith('bv') or args[0].lower().startswith('av'):
+                origin_id: str = args[0].strip()
         else:
             return None
     else:
