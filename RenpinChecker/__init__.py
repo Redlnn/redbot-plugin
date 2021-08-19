@@ -38,7 +38,7 @@ def del_outdated_data(date: str) -> None:
             os.remove(os.path.join(data_folder, _))
 
 
-def read_data(date: str, qq: int) -> int:
+def read_data(date: str, qq: str) -> int:
     """
     在文件中读取指定QQ今日已生成过的随机数，若今日未生成，则新生成一个随机数并写入文件
     """
@@ -56,13 +56,13 @@ def read_data(date: str, qq: int) -> int:
         f.seek(0, 2)  # 将读写指针放在文件尾部
         if yml_data is None:  # 若文件为空，则生成一随机数并写入到文件中，然后返回生成的随机数
             random_int = random.randint(0, 100)
-            yml.dump({str(qq): random_int}, f, allow_unicode=True)
+            yml.dump({qq: random_int}, f, allow_unicode=True)
             return random_int
-        if str(qq) in yml_data.keys():  # 若文件中有指定QQ的数据则读取并返回
-            return yml_data[str(qq)]
+        if qq in yml_data.keys():  # 若文件中有指定QQ的数据则读取并返回
+            return yml_data[qq]
         else:  # 若文件中没有指定QQ的数据，则生成一随机数并写入到文件中，然后返回生成的随机数
             random_int = random.randint(0, 100)
-            yml.dump({str(qq): random_int}, f, allow_unicode=True)
+            yml.dump({qq: random_int}, f, allow_unicode=True)
             return random_int
 
 
@@ -73,7 +73,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
 
     if message.asDisplay().lower() in ('.jrrp', '!jrrp'):  # 可用命令：.jrrp !jrrp ，即 JinRiRenPin
         date_today = datetime.datetime.now().strftime('%Y-%m-%d')  # 获得今日日期
-        jrrp = read_data(date_today, member.id)
+        jrrp = read_data(date_today, str(member.id))
 
         await app.sendGroupMessage(group, MessageChain.create([
             At(member.id),
