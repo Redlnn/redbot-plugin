@@ -111,6 +111,7 @@ UP主：{video_up_name}
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
         return None
+    origin_id = None
     if message.has(App):  # noqa
         app_json = message.get(App)[0].content  # noqa
         app_dict = json.loads(app_json)
@@ -195,7 +196,10 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
         return None
 
     try:
-        info_text, video_cover_url = await get_video_info(origin_id, app, group)
+        if origin_id is not None:
+            info_text, video_cover_url = await get_video_info(origin_id, app, group)
+        else:
+            return None
     except ValueError:
         return None
 
