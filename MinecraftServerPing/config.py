@@ -51,6 +51,6 @@ def read_cfg():
 
 
 if __name__ == '__main__':
-    print(read_cfg()['active_group'])
+    pass
 
 __all__ = [read_cfg]
