@@ -11,8 +11,8 @@
 1. [随机整数](./RollNumber.py)
 2. [查询B站视频信息](./GetBilibiliVideoInfo.py)
 3. [我的世界中文Wiki搜索](./SearchMinecraftWiki.py)
-4. [自动回复-精确匹配](./AutoReply/)
-5. [文本转图片](./Text2Img/)
+4. [文本转图片](./Text2Img/)
+5. [自动回复-精确匹配](./AutoReply/) - 需要 `文本转图片` 作为前置
 6. [获取我的世界服务器信息](./MinecraftServerPing)
 7. [人品检测](./RenpinChecker/)
 8. ...

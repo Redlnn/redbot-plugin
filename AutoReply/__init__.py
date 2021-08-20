@@ -7,8 +7,8 @@ import os
 from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Source, Image)
 
 from miraibot import GetCore
+from plugins.Text2Img.gen_img import generate_img
 from .config import read_cfg
-from .gen_img import generate_img
 from .info import MODULE_NAME
 
 bcc = GetCore.bcc()
