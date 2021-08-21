@@ -4,6 +4,7 @@
 from typing import Union
 import requests
 import regex
+import time
 
 from functools import wraps
 from graia.application.entry import MemberPerm
@@ -35,6 +36,16 @@ class LengthCheck:
             else:
                 return func(*args, **kwargs)
         return decorated
+
+
+def get_time() -> str:
+    """
+    :return: 当前时间，格式1970-01-01 12:00:00
+    """
+    time_now = int(time.time())
+    time_local = time.localtime(time_now)
+    dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
+    return dt
 
 
 def PermissionCheck(func):  # noqa
