@@ -79,6 +79,8 @@ def execute_query_sql(sql_command: str):
     try:
         cur.execute(sql_command)
         return cur.fetchone()
+    except Exception as e:
+        raise e
     finally:
         cur.close()
         conn.close()
@@ -88,7 +90,11 @@ def execute_update_sql(sql_command: str):
     conn, cur = _init_db()
     try:
         cur.execute(sql_command)
-    finally:
+    except Exception as e:
+        cur.close()
+        conn.close()
+        raise e
+    else:
         cur.close()
         conn.commit()
         conn.close()
