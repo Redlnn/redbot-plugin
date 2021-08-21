@@ -90,7 +90,7 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
     info_text = f'''\
 BV号：{video_bvid}
 av号：av{video_avid}
-标题：{video_title[:20] if len(video_title) > 20 else video_title}
+标题：{video_title[:20] + "..." if len(video_title) > 20 else video_title}
 简介：{video_desc[:25] + "..." if len(video_desc) > 25 else video_desc}
 UP主：{video_up_name}
 时长：{video_length}
