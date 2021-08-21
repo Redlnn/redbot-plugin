@@ -32,7 +32,7 @@ def execute_command(command: str) -> tuple[None, str]:
         rcon.login(__PASSWORD)
     except Exception as e:
         logger.error(f'RCON连接失败: ↓\n{traceback.format_exc()}')
-        raise ValueError(f'RCON连接失败: ↓\n{e}')
+        raise e
     resp: str = rcon.command(command)
     logger.debug(f'服务器返回值如下: ↓\n{resp}')
     if resp == '':

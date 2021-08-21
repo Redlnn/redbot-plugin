@@ -40,8 +40,8 @@ async def whitelist(*args, **kwargs):
 
 async def get_player_list(*args, **kwargs):
     try:
-        player_list = execute_command('list').split(':')
-    except ValueError as e:
+        player_list: str = execute_command('list').split(':')
+    except Exception as e:
         return str(e)
     if player_list[1] == '':
         return '服务器目前没有在线玩家'
@@ -53,8 +53,8 @@ async def get_player_list(*args, **kwargs):
 
 async def get_server_tps(*args, **kwargs):
     try:
-        result = execute_command('tps')
-    except ValueError as e:
+        result: str = execute_command('tps')
+    except Exception as e:
         return str(e)
     result = result.replace('TPS from last 5s, 1m, 5m, 15m', '服务器过去5秒、1分钟、5分钟、15分钟的TPS')
     result = result.replace('TPS from last 1m, 5m, 15m', '服务器过去1分钟、5分钟、15分钟的TPS')
@@ -64,8 +64,8 @@ async def get_server_tps(*args, **kwargs):
 
 async def get_server_mspt(*args, **kwargs):
     try:
-        result = execute_command('tps')
-    except ValueError as e:
+        result: str = execute_command('tps')
+    except Exception as e:
         return str(e)
     return result.replace('Server tick times (avg/min/max) from last 5s, 10s, 1m', '服务器过去5秒/10秒/1分钟内的mspt (平均/最小/最大)')
 
