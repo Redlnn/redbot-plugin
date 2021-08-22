@@ -94,14 +94,15 @@ av号：av{video_avid}
 简介：{video_desc[:25] + "..." if len(video_desc) > 25 else video_desc}
 UP主：{video_up_name}
 时长：{video_length}
-发布时间：{video_pub_date}'''
+发布时间：{video_pub_date}
+'''
     if video_sub_num > 1:
         info_text += f'分P数量：{video_sub_num}\n'
-    info_text += f'{video_view if int(video_view) < 9999 else round(int(video_view) / 10000, 1)}万播放 '
-    info_text += f'{video_danmu if int(video_danmu) < 9999 else round(int(video_danmu) / 10000, 1)}万弹幕\n'
-    info_text += f'{video_like if int(video_like) < 9999 else round(int(video_like) / 10000, 1)}万点赞 '
-    info_text += f'{video_coin if int(video_coin) < 9999 else round(int(video_coin) / 10000, 1)}万投币 '
-    info_text += f'{video_favorite if int(video_favorite) < 9999 else round(int(video_favorite) / 10000, 1)}万收藏\n'
+    info_text += f'{video_view if video_view < 10000 else str(round(video_view / 10000, 1)) + "万"}播放 '
+    info_text += f'{video_danmu if video_danmu < 10000 else str(round(video_danmu / 10000, 1)) + "万"}弹幕\n'
+    info_text += f'{video_like if video_like < 10000 else str(round(video_like / 10000, 1)) + "万"}点赞 '
+    info_text += f'{video_coin if video_coin < 10000 else str(round(video_coin / 10000, 1)) + "万"}投币 '
+    info_text += f'{video_favorite if video_favorite < 10000 else str(round(video_favorite / 10000, 1)) + "万"}收藏\n'
     info_text += f'链接：https://www.bilibili.com/video/{video_bvid}'
 
     return info_text, video_cover_url
