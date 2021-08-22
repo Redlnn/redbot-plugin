@@ -39,19 +39,19 @@ async def add_whitelist_to_qq(qq: int, mc_id: str, app: GraiaMiraiApplication, m
     if not is_mc_id(mc_id):
         await app.sendGroupMessage(group, MessageChain.create([
             Plain('你选择的不是一个有效的id')
-        ]))
+        ]), quote=message.get(Source).pop(0))
 
     try:
         real_mc_id, uuid = get_uuid(mc_id)
     except (requests.exceptions.Timeout, urllib3.exceptions.TimeoutError):
         await app.sendGroupMessage(group, MessageChain.create([
             Plain(f'向 mojang 查询【{mc_id}】的 uuid 超时')
-        ]))
+        ]), quote=message.get(Source).pop(0))
         return
     except Exception as e:
         await app.sendGroupMessage(group, MessageChain.create([
             Plain(f'向 mojang 查询【{mc_id}】的 uuid 时发生了意料之外的错误:  ↓\n{str(e)}')
-        ]))
+        ]), quote=message.get(Source).pop(0))
         logger.error(f'向 mojang 查询【{mc_id}】的 uuid 时发生了意料之外的错误:  ↓\n{traceback.format_exc()}')
         return
 
@@ -62,13 +62,13 @@ async def add_whitelist_to_qq(qq: int, mc_id: str, app: GraiaMiraiApplication, m
         if use_status == qq:
             await app.sendGroupMessage(group, MessageChain.create([
                 Plain('这个id本来就是你哒')
-            ]))
+            ]), quote=message.get(Source).pop(0))
         else:
             await app.sendGroupMessage(group, MessageChain.create([
                 Plain('你想要这个吗？\n这个是 '),
                 At(use_status),
                 Plain(f'({use_status}) 哒~'),
-            ]))
+            ]), quote=message.get(Source).pop(0))
         return
 
     had_status = await check_qq_had_id(qq, app, message, group)

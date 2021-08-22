@@ -19,6 +19,54 @@ logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()
 
 
+async def query_qq_by_id(mc_id: str, app: GraiaMiraiApplication, group: Group, message: MessageChain) -> tuple[None, int]:
+    if not is_mc_id(mc_id):
+        await app.sendGroupMessage(group, MessageChain.create([
+            Plain('你选择的不是一个有效的id')
+        ]), quote=message.get(Source).pop(0))
+        return
+    try:
+        mc_id, uuid = get_uuid(mc_id)
+    except (requests.exceptions.Timeout, urllib3.exceptions.TimeoutError):
+        await app.sendGroupMessage(group, MessageChain.create([
+            Plain(f'向 mojang 查询【{mc_id}】的 uuid 超时')
+        ]), quote=message.get(Source).pop(0))
+        return
+    except Exception as e:
+        await app.sendGroupMessage(group, MessageChain.create([
+            Plain(f'向 mojang 查询【{mc_id}】的 uuid 时发生了意料之外的错误:  ↓\n{str(e)}')
+        ]), quote=message.get(Source).pop(0))
+        logger.error(f'向 mojang 查询【{mc_id}】的 uuid 时发生了意料之外的错误:  ↓\n{traceback.format_exc()}')
+        return
+    if uuid is None:
+        code = mc_id
+        if code == 204:
+            await app.sendGroupMessage(group, MessageChain.create([
+                Plain('你选择的不是一个正版id')
+            ]), quote=message.get(Source).pop(0))
+            return
+        else:
+            await app.sendGroupMessage(group, MessageChain.create([
+                Plain(f'向 mojang 查询【{mc_id}】的 uuid 时，服务器阿巴阿巴了')
+            ]), quote=message.get(Source).pop(0))
+            return
+    query_sql = f'select qq from {cfg["table"]} where main_uuid=\'{uuid}\' OR alt_uuid=\'{uuid}\';'
+    try:
+        res = execute_query_sql(query_sql)
+    except Exception as e:  # noqa
+        await app.sendGroupMessage(group, MessageChain.create([
+            Plain(f'在数据库查询 uuid【{uuid}】对应的qq时出错: ↓\n{str(e)}')
+        ]), quote=message.get(Source).pop(0))
+        logger.error(f'在数据库查询 uuid【{uuid}】对应的qq时出错: ↓\n{traceback.format_exc()}')
+        return
+    if res is None:
+        await app.sendGroupMessage(group, MessageChain.create([
+            Plain(f'好像没有使用{mc_id}的玩家呢~')
+        ]), quote=message.get(Source).pop(0))
+        return
+    return res[0]
+
+
 async def query_wl_by_qq(qq: int, app: GraiaMiraiApplication, group: Group, message: MessageChain):
     query_sql = f'select main_uuid,main_add_time,alt_uuid,alt_add_time from {cfg["table"]} where qq={qq};'
     try:
@@ -34,11 +82,11 @@ async def query_wl_by_qq(qq: int, app: GraiaMiraiApplication, group: Group, mess
             await app.sendGroupMessage(group, MessageChain.create([
                 At(qq),
                 Plain(f'({qq}) 好像一个白名单都没有呢~')
-            ]))
+            ]), quote=message.get(Source).pop(0))
         except UnknownTarget:
             await app.sendGroupMessage(group, MessageChain.create([
                 Plain(f'{qq} 好像一个白名单都没有呢~')
-            ]))
+            ]), quote=message.get(Source).pop(0))
         finally:
             return
     try:
@@ -63,59 +111,17 @@ async def query_wl_by_qq(qq: int, app: GraiaMiraiApplication, group: Group, mess
     try:
         await app.sendGroupMessage(group, MessageChain.create([
             Plain('QQ: '), At(qq), Plain(f' ({res[0]})\n'), Plain(msg_send)
-        ]))
+        ]), quote=message.get(Source).pop(0))
     except UnknownTarget:
         await app.sendGroupMessage(group, MessageChain.create([
             Plain(f'QQ: {qq}\n{msg_send}')
-        ]))
+        ]), quote=message.get(Source).pop(0))
 
 
 async def query_wl_by_id(mc_id: str, app: GraiaMiraiApplication, group: Group, message: MessageChain):
-    if not is_mc_id(mc_id):
-        await app.sendGroupMessage(group, MessageChain.create([
-            Plain('你选择的不是一个有效的id')
-        ]))
-        return
-    try:
-        mc_id, uuid = get_uuid(mc_id)
-    except (requests.exceptions.Timeout, urllib3.exceptions.TimeoutError):
-        await app.sendGroupMessage(group, MessageChain.create([
-            Plain(f'向 mojang 查询【{mc_id}】的 uuid 超时')
-        ]))
-        return
-    except Exception as e:
-        await app.sendGroupMessage(group, MessageChain.create([
-            Plain(f'向 mojang 查询【{mc_id}】的 uuid 时发生了意料之外的错误:  ↓\n{str(e)}')
-        ]))
-        logger.error(f'向 mojang 查询【{mc_id}】的 uuid 时发生了意料之外的错误:  ↓\n{traceback.format_exc()}')
-        return
-    if uuid is None:
-        code = mc_id
-        if code == 204:
-            await app.sendGroupMessage(group, MessageChain.create([
-                Plain('你选择的不是一个正版id')
-            ]))
-            return
-        else:
-            await app.sendGroupMessage(group, MessageChain.create([
-                Plain(f'向 mojang 查询【{mc_id}】的 uuid 时，服务器阿巴阿巴了')
-            ]))
-            return
-    query_sql = f'select qq from {cfg["table"]} where main_uuid=\'{uuid}\' OR alt_uuid=\'{uuid}\';'
-    try:
-        res = execute_query_sql(query_sql)
-    except Exception as e:  # noqa
-        await app.sendGroupMessage(group, MessageChain.create([
-            Plain(f'在数据库查询 uuid【{uuid}】对应的qq时出错: ↓\n{str(e)}')
-        ]), quote=message.get(Source).pop(0))
-        logger.error(f'在数据库查询 uuid【{uuid}】对应的qq时出错: ↓\n{traceback.format_exc()}')
-        return
-    if res is None:
-        await app.sendGroupMessage(group, MessageChain.create([
-            Plain(f'好像没有使用{mc_id}的玩家呢~')
-        ]))
-        return
-    await query_wl_by_qq(res[0], app, group, message)
+    res_qq = query_qq_by_id(mc_id, app, group, message)
+    if res_qq is not None:
+        await query_wl_by_qq(res_qq, app, group, message)
 
 
 async def whitelist_info(*args, message: MessageChain, **kwargs):
