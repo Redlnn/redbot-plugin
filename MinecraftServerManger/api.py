@@ -30,11 +30,11 @@ class LengthCheck:
 
     def __call__(self, func):
         @wraps(func)
-        def decorated(*args, **kwargs):
+        async def decorated(*args, **kwargs):
             if len(args) != self.length:
                 return None
             else:
-                return func(*args, **kwargs)
+                return await func(*args, **kwargs)
         return decorated
 
 
@@ -93,7 +93,10 @@ def get_uuid(mc_id: str) -> tuple[tuple[str, str], tuple[int, None]]:
     :return: 大小写正确的用户名：name, 该用户名对应的简化：uuid
     """
     url = f'https://api.mojang.com/users/profiles/minecraft/{mc_id}'
-    res = requests.get(url, timeout=5)
+    try:
+        res = requests.get(url, timeout=5)
+    except Exception as e:
+        raise e
     code = res.status_code
     if code == 200:
         mc_name: str = res.json()['name']
@@ -115,7 +118,10 @@ def get_mc_id(uuid: str) -> Union[None, str, int]:
     if not is_uuid(uuid):
         return None
     url = f'https://sessionserver.mojang.com/session/minecraft/profile/{uuid}'
-    res = requests.get(url, timeout=5)
+    try:
+        res = requests.get(url, timeout=5)
+    except Exception as e:
+        raise e
     code = res.status_code
     if code == 200:
         return res.json()['name']

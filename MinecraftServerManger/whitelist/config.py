@@ -32,7 +32,7 @@ def write_cfg() -> None:
     """
     with open(os.path.join(config_folder, 'database.yml'), 'w', encoding='utf-8') as f:
         yaml.dump(yaml.load(default_cfg), f)
-    logger.warning('缺少配置文件，已用缺省配置生成新配置文件')
+    logger.warning('缺少数据库配置文件，已用缺省配置生成新文件')
 
 
 def read_cfg():
@@ -52,11 +52,11 @@ def read_cfg():
         f = open(os.path.join(config_folder, 'database.yml'), mode='r', encoding='utf-8')
         cfg_dict = yaml.load(f)
         f.close()
-        logger.debug(f'配置文件内容: ↓\n{cfg_dict}')
+        logger.debug(f'数据库配置文件内容: ↓\n{cfg_dict}')
         return cfg_dict
     except:  # noqa
-        logger.error(f'打开配置文件时出现错误: ↓\n{traceback.format_exc()}')
-        raise ValueError(f'打开配置文件时出现错误: ↓\n{traceback.format_exc()}')
+        logger.error(f'打开数据库配置文件时出现错误: ↓\n{traceback.format_exc()}')
+        raise ValueError(f'打开数据库配置文件时出现错误: ↓\n{traceback.format_exc()}')
 
 
 if __name__ == '__main__':

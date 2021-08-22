@@ -27,7 +27,7 @@ def write_cfg() -> None:
     """
     with open(os.path.join(config_folder, 'rcon.yml'), 'w', encoding='utf-8') as f:
         yaml.dump(yaml.load(default_cfg), f)
-    logger.warning('缺少配置文件，已用缺省配置生成新配置文件')
+    logger.warning('缺少RCON配置文件，已用缺省配置生成新文件')
 
 
 def read_cfg():
@@ -50,8 +50,8 @@ def read_cfg():
         logger.debug(f'配置文件内容: ↓\n{cfg_dict}')
         return cfg_dict
     except:  # noqa
-        logger.error(f'打开配置文件时出现错误: ↓\n{traceback.format_exc()}')
-        raise ValueError(f'打开配置文件时出现错误: ↓\n{traceback.format_exc()}')
+        logger.error(f'打开RCON配置文件时出现错误: ↓\n{traceback.format_exc()}')
+        raise ValueError(f'打开RCON配置文件时出现错误: ↓\n{traceback.format_exc()}')
 
 
 if __name__ == '__main__':
