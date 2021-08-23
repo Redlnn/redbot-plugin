@@ -6,7 +6,6 @@ import os
 import time
 
 import numpy as np
-import regex
 from PIL import Image, ImageDraw, ImageFont
 
 from .config import read_cfg
@@ -33,6 +32,7 @@ def __get_text_config() -> dict:
     font_color: str = cfg['text_to_img']['text_config']['font_color']  # 字体颜色
     line_space: int = cfg['text_to_img']['text_config']['line_space']  # 行间距
     margin: int = cfg['text_to_img']['text_config']['margin']  # 上下左右距离内框的间距
+    char_per_line: int = cfg['text_to_img']['text_config']['char_per_line']
     text_config = {
         'ttf_path': ttf_path,
         'is_ttc_font': is_ttc_font,
@@ -40,16 +40,18 @@ def __get_text_config() -> dict:
         'font_size': font_size,
         'font_color': font_color,
         'line_space': line_space,
-        'margin': margin
+        'margin': margin,
+        'char_per_line': char_per_line
     }
     # text_config = {
-    #     'ttf_path': r'',
+    #     'ttf_path': r'C:\Windows\Fonts\OPPOSans-B.ttf',
     #     'is_ttc_font': False,
     #     'ttc_font_index': 1,
     #     'font_size': 50,
     #     'font_color': '#645647',
     #     'line_space': 30,
-    #     'margin': 80
+    #     'margin': 80,
+    #     'char_per_line': 25
     # }
     return text_config
 
@@ -102,60 +104,59 @@ def __get_time(mode: int = 1) -> str:
     return dt
 
 
-def __is_cjk_char(char: str = None) -> bool:
-    """
-    判断是否为中日韩字符
-    """
-    return True if regex.match(r'[\u2100-\u2BFF\u2E80-\u9FFF\uF900-\uFAFF\uFE30-\uFE4F\uFF01-\uFF64\uFFE0-\uFFE7]',
-                               char) else False
-
-
-def __cut_str2list(text: str = None, cut_len: int = None) -> list:
-    """
-    将超长的字符串切为列表
-
-    :param text: 要被切的字符串
-    :param cut_len: 每行字数
-    """
-    if text == '':
-        return ['']
-    cut_result_list = []
-    ascii_len = 0
-    temp_str = ''
-    for _ in text:
-        if __is_cjk_char(_):
-            ascii_len += 2
-        else:
-            ascii_len += 1
-        temp_str += _
-        if ascii_len < (cut_len * 2):
+def conver_line_to_list(text: str, char_per_line: int, line_width: int, font: ImageFont.FreeTypeFont, font_size):
+    i = 0
+    j = 0
+    text_list = []
+    # re_ = '[a-zA-Z0-9]'
+    start_symbol = ('[', '{', '<', '(', '【', '《', '（', '〈', '〖', '［', '〔', '“', '‘', '『', '「', '〝')
+    end_symbol = (',', '.', '!', '?', ';', ':', ']', '}', '>', ')', '%', '~', '…', '，', '。', '！,', '？', '；', '：', '】', '》', '）', '〉', '〗', '］', '〕', '”', '’', '～', '』', '」', '〞')
+    while True:
+        tmp_text = text[i:i + char_per_line + j]
+        size = font.getsize(tmp_text)
+        if abs(size[0] - line_width) < font_size:
+            if i + char_per_line + j < len(text):
+                if text[i + char_per_line + j] in end_symbol:
+                    j += 1
+                    text_list.append(text[i:i + char_per_line + j])
+                elif text[i + char_per_line + j] in start_symbol:
+                    j -= 1
+                    text_list.append(text[i:i + char_per_line + j])
+                elif text[i + char_per_line + j] == ' ':
+                    text_list.append(tmp_text)
+                    j += 1
+                else:
+                    text_list.append(tmp_text)
+            else:
+                text_list.append(tmp_text)
+            i += char_per_line + j
+            j = 0
+        elif char_per_line + j > len(tmp_text):
+            text_list.append(tmp_text)
+            i += char_per_line + j
+            j = 0
+            break
+        elif size[0] > line_width:
+            j -= 1
             continue
-        cut_result_list.append(temp_str)
-        temp_str = ''
-        ascii_len = 0
-    if temp_str != '':
-        cut_result_list.append(temp_str)
-    del temp_str
-    del ascii_len
-    return cut_result_list
+        elif size[0] < line_width:
+            j += 1
+            continue
+        if i >= len(text):
+            break
+    del tmp_text
+    return text_list
 
 
-# def __cut_str(text: str, cut_len: int) -> str:
-#     temp_str = ''
-#     for _ in text.split('\n'):
-#         for __ in __cut_str2list(_, cut_len):
-#             temp_str += f'{__}\n'
-#     return temp_str
-
-
-# def __cut(obj, cut_len: int) -> list:
-#     return [obj[i:i+cut_len] for i in range(0, len(obj), cut_len)] if obj != '' else ['']
-
-
-def __ascii_len(text: str = None) -> int:  # 非Ascii字符按两个字符算
-    len_txt = len(text)
-    len_txt_utf8 = len(text.encode('utf-8'))
-    return int((len_txt_utf8 - len_txt) / 2 + len_txt)
+def conver_text_to_list(text: str, char_per_line: int, line_width: int, font: ImageFont.FreeTypeFont, font_size):
+    text_list = text.splitlines(False)
+    n_text_list = []
+    for _ in text_list:
+        if _ == '':
+            n_text_list.append('')
+        else:
+            n_text_list.extend(conver_line_to_list(_, char_per_line, line_width, font, font_size))
+    return n_text_list
 
 
 def generate_img(text: str = None) -> str:
@@ -181,35 +182,25 @@ def generate_img(text: str = None) -> str:
                                         size=text_config['font_size'] - int(0.3 * text_config['font_size']))
     extra_text1 = '由 Red_lnn 的 Bot 生成'  # 额外文本1
     extra_text2 = __get_time()  # 额外文本2
-    text_list = []
-    for _ in text.split('\n'):
-        text_list.extend(__cut_str2list(_, 20))
-    lines = len(text_list)  # 获取行数
-    longest_text = ''
-    tmp = 0
-    for _ in text_list:  # 获取最长的一行
-        size = __ascii_len(_)
-        if tmp < size:
-            longest_text = _
-            tmp = size
-    del tmp
-    longest_line_width, line_height = font.getsize(longest_text)  # 获取最长的那一行的宽高
-    extra_text1_width = extra_font.getlength(extra_text1)  # 获取最长的那一行的宽
-    extra_text2_width = extra_font.getlength(extra_text2)  # 获取最长的那一行的宽
-    if longest_line_width < extra_text1_width:
-        longest_line_width = int(extra_text1_width)  # 获取最长的那一行的宽
-    if longest_line_width < extra_text2_width:
-        longest_line_width = int(extra_text2_width)  # 获取最长的那一行的宽
+
+    font_size = font.getsize('一')  # 一个字符框的大小
+    line_height = font_size[1]  # 行高
     line_height += text_config['line_space']  # 加入行距
+    line_width = text_config['char_per_line'] * font_size[0]  # 行宽
+
+    text_list = conver_text_to_list(text, text_config['char_per_line'], line_width, font, text_config['font_size'])
+    lines = len(text_list)
+
     # 画布高度=((行高+行距)*行数)-行距+(2*正文边距)+(边框上边距+4*边框厚度+2*内外框距离+边框下边距)
     bg_height = (line_height * lines) - text_config['line_space'] + (2 * text_config['margin']) + (
             bg_config['box_top_margin'] + (4 * bg_config['outline_width']) + (2 * bg_config['box_interval'])
     ) + bg_config['box_bottom_margin']
-    # 画布宽度=最长一行的宽度+2*正文侧面边距+2*(边框侧面边距+(2*边框厚度)+内外框距离)
-    bg_width = longest_line_width + (2 * text_config['margin']) + (2 * (bg_config['box_side_margin'] + (
+    # 画布宽度=行宽+2*正文侧面边距+2*(边框侧面边距+(2*边框厚度)+内外框距离)
+    bg_width = line_width + (2 * text_config['margin']) + (2 * (bg_config['box_side_margin'] + (
             2 * bg_config['outline_width']) + bg_config['box_interval']))
     # 根据所有行的总高度及最长一行的宽度生成画布的大小
     bg_size = np.zeros((bg_height, bg_width, 4), dtype=np.uint8)
+
     canvas = Image.fromarray(bg_size)  # 生成绘图画布
     draw = ImageDraw.Draw(canvas)
     # 从这里开始绘图均为(x, y)坐标，横坐标x，纵坐标y
@@ -281,7 +272,7 @@ def generate_img(text: str = None) -> str:
 
     # 绘制正文文字
     # 开始坐标 x=边框侧边距+2*边框厚度+内外框距离+正文侧边距 y=边框上边距+2*边框厚度+内外框距离+正文上边距+行号*(行高+行距)
-    for _ in range(len(text_list)):
+    for _ in range(lines):
         draw.text(
             (
                 bg_config['box_side_margin'] + (2 * bg_config['outline_width']) + bg_config['box_interval'] + text_config['margin'],  # noqa
@@ -318,7 +309,7 @@ def generate_img(text: str = None) -> str:
     canvas.save(img_path, format='JPEG', quality=95, optimize=True, progressive=True, subsampling=1, qtables='web_high')
     # img_name = 'temp_{}.png'.format(__get_time(2))  # 自定义临时文件的保存名称
     # img_path = os.path.join(temp_dir_path, img_name)  # 自定义临时文件保存路径
-    # 保存为图片 https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html?highlight=subsampling#png
+    # # 保存为图片 https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html?highlight=subsampling#png
     # canvas.save(img_path, format='PNG', optimize=True)
     logger.debug(f'已生成图片并保存至: ↓\n{img_path}')
     return img_path

@@ -29,6 +29,7 @@ text_to_img:  # 此项为文字生成图片相关
     font_color: '#645647'  # 字体颜色
     line_space: 30  # 行间距
     margin: 80  # 上下左右距离内框的间距
+    char_per_line: 25  # 每行长度（单位：字符数量，以中文字符为准）
 
   background_config:  # 背景设置
     background_color: '#fffcf6'  # 背景颜色
