@@ -2,17 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import logging
+import os
 import sqlite3
 import traceback
-import os
 from typing import Union
-from pymysql.cursors import Cursor
 
 import pymysql
+from pymysql.cursors import Cursor
 
-from ..info import MODULE_NAME
 from .config import read_cfg
-
+from ..info import MODULE_NAME
 
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()

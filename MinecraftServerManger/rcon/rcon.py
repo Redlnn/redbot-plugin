@@ -3,11 +3,12 @@
 
 import logging
 import traceback
+from typing import Optional
 
 from mctools import RCONClient
 
-from ..info import MODULE_NAME
 from .config import read_cfg
+from ..info import MODULE_NAME
 
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()
@@ -17,7 +18,7 @@ __PORT = cfg['port']  # Port number of the RCON server
 __PASSWORD = cfg['password']  # Password of the RCON server
 
 
-def execute_command(command: str) -> tuple[None, str]:
+def execute_command(command: str) -> Optional[str]:
     """
 
     通过 RCON 连接服务器

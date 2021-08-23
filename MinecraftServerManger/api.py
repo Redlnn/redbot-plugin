@@ -1,27 +1,28 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from typing import Union
-import requests
-import regex
 import time
-
 from functools import wraps
+from typing import Union
+
+import regex
+import requests
 from graia.application.entry import MemberPerm
 
 
-class PrefixCheck:
-    def __init__(self, prefix: str = None):
-        self.prefix = prefix
-
-    def __call__(self, func):
-        @wraps(func)
-        def decorated(*args, **kwargs):
-            if args[0] != self.prefix:
-                return None
-            else:
-                return func(*args, **kwargs)
-        return decorated
+# class PrefixCheck:
+#     def __init__(self, prefix: str = None):
+#         self.prefix = prefix
+#
+#     def __call__(self, func):
+#         @wraps(func)
+#         def decorated(*args, **kwargs):
+#             if args[0] != self.prefix:
+#                 return None
+#             else:
+#                 return func(*args, **kwargs)
+#
+#         return decorated
 
 
 class LengthCheck:
@@ -35,7 +36,19 @@ class LengthCheck:
                 return None
             else:
                 return await func(*args, **kwargs)
+
         return decorated
+
+
+def PermissionCheck(func):  # noqa
+    @wraps(func)
+    async def decorated(*args, **kwargs):
+        if kwargs['member'].permission not in (MemberPerm.Administrator, MemberPerm.Owner):
+            return '你没有权限执行此命令'
+        else:
+            return await func(*args, **kwargs)
+
+    return decorated
 
 
 def get_time() -> str:
@@ -46,16 +59,6 @@ def get_time() -> str:
     time_local = time.localtime(time_now)
     dt = time.strftime("%Y-%m-%d %H:%M:%S", time_local)
     return dt
-
-
-def PermissionCheck(func):  # noqa
-    @wraps(func)
-    async def decorated(*args, **kwargs):
-        if kwargs['member'].permission not in (MemberPerm.Administrator, MemberPerm.Owner):
-            return '你没有权限执行此命令'
-        else:
-            return await func(*args, **kwargs)
-    return decorated
 
 
 def is_mc_id(mc_id: str) -> bool:
@@ -85,7 +88,7 @@ def is_uuid(uuid: str) -> Union[str, bool]:
         return False
 
 
-def get_uuid(mc_id: str) -> tuple[tuple[str, str], tuple[int, None]]:
+def get_uuid(mc_id: str) -> Union[tuple[str, str], tuple[int, None]]:
     """
     通过 id 从 Mojang 获取 uuid
 
