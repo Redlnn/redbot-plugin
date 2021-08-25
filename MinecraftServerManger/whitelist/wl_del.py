@@ -146,6 +146,17 @@ async def del_whitelist_from_qq(qq: int, app: GraiaMiraiApplication, message: Me
                 await app.sendGroupMessage(group, MessageChain.create([
                     Plain(f'只从服务器上删除了 {qq} 的白名单都删掉啦~')
                 ]), quote=message.get(Source).pop(0))  # noqa
+        elif not flag[0] and not flag[1]:
+            try:
+                await app.sendGroupMessage(group, MessageChain.create([
+                    Plain('从服务器上删除 '),
+                    At(qq),
+                    Plain(f' ({qq}) 的白名单时失败')
+                ]), quote=message.get(Source).pop(0))  # noqa
+            except UnknownTarget:
+                await app.sendGroupMessage(group, MessageChain.create([
+                    Plain(f'从服务器上删除 {qq} 的白名单时失败')
+                ]), quote=message.get(Source).pop(0))  # noqa
         else:
             try:
                 await app.sendGroupMessage(group, MessageChain.create([
