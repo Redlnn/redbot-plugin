@@ -32,7 +32,7 @@ def execute_command(command: str) -> Optional[str]:
     try:
         rcon.login(__PASSWORD)
     except Exception as e:
-        logger.error(f'RCON连接失败: ↓\n{traceback.format_exc()}')
+        logger.error(f'通过RCON连接【{__HOST}:{__PORT}】失败: ↓\n{traceback.format_exc()}')
         raise e
     resp: str = rcon.command(command)
     logger.debug(f'服务器返回值如下: ↓\n{resp}')
