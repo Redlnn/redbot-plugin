@@ -53,7 +53,13 @@ async def del_whitelist_from_qq(qq: int, app: GraiaMiraiApplication, message: Me
             ]), quote=message.get(Source).pop(0))  # noqa
             logger.error(f'无法查询【{had_status[0]}】对应的正版id: ↓\n{traceback.format_exc()}')
         else:
-            result = execute_command(f'whitelist remove {mc_id}')
+            try:
+                result = execute_command(f'whitelist remove {mc_id}')
+            except:  #noqa
+                await app.sendGroupMessage(group, MessageChain.create([
+                    Plain(f'从服务器删除id为【{mc_id_1}】的白名单时，服务器返回意料之外的内容：↓\n{result}')
+                ]), quote=message.get(Source).pop(0))  # noqa
+                return
             if result.startswith('Removed '):
                 try:
                     await app.sendGroupMessage(group, MessageChain.create([
