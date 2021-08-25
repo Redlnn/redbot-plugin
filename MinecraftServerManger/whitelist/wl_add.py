@@ -125,7 +125,6 @@ async def add_whitelist_to_qq(
         await app.sendGroupMessage(group, MessageChain.create([
             Plain(f'添加白名单时已写入数据库但无法连接到服务器，请联系管理解决: ↓\n{str(e)}')
         ]), quote=message.get(Source).pop(0))  # noqa
-        logger.error(f'无法通过RCON连接到服务器: ↓\n{traceback.format_exc()}')
         return
     if res.startswith('Added'):
         await app.sendGroupMessage(group, MessageChain.create([
