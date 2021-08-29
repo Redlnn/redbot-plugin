@@ -2,9 +2,17 @@
 # -*- coding: utf-8 -*-
 
 """
-根据av号或BV号获取B站视频信息，消息最前面加感叹号
+识别群内的B站链接、分享、av号、BV号并获取其对应的视频的信息
 
-用法：在本Bot账号所在的任一一QQ群中发送 av号 或 BV号 均可触发本插件功能
+以下几种消息均可触发
+ - 新版B站app分享的小程序
+ - 旧版B站app分享的xml消息
+ - B站概念版分享的json消息
+ - 文字消息里含有B站视频地址，如 https://www.bilibili.com/video/av2
+ - 文字消息里含有B站视频地址，如 https://www.bilibili.com/video/BV1xx411c7mD
+ - 文字消息里含有B站视频地址，如 https://b23.tv/3V31Ap
+ - !BV1xx411c7mD
+ - !av2
 """
 
 import json
@@ -20,12 +28,13 @@ from requests import get
 from miraibot import GetCore
 
 MODULE_NAME = '获取B站视频信息'
-MODULE_DESC = ''
+MODULE_DESC = '识别群内的B站链接、分享、av号、BV号并获取其对应的视频的信息'
 MODULE_AUTHOR = 'Red_lnn'
 MODULE_AUTHOR_CONTACT = 'https://github.com/Redlnn'
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME
+__plugin_usage__ = MODULE_DESC
 
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 

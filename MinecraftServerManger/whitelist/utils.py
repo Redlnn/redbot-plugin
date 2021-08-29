@@ -11,6 +11,10 @@ from .config import read_cfg
 from .db import execute_query_sql
 from ..info import MODULE_NAME
 
+__all__ = [
+    "check_qq_had_id"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()
 

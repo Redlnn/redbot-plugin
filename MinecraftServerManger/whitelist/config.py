@@ -9,6 +9,10 @@ from ruamel.yaml import YAML
 
 from ..info import MODULE_NAME
 
+__all__ = [
+    "read_cfg"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 
 default_cfg = """\
@@ -61,5 +65,3 @@ def read_cfg():
 
 if __name__ == '__main__':
     pass
-
-__all__ = [read_cfg]

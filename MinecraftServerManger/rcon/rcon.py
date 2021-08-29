@@ -10,6 +10,10 @@ from mctools import RCONClient
 from .config import read_cfg
 from ..info import MODULE_NAME
 
+__all__ = [
+    "execute_command"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()
 
@@ -40,8 +44,3 @@ def execute_command(command: str) -> Optional[str]:
         return None
     else:
         return resp.rstrip()
-
-
-__all__ = [
-    execute_command
-]

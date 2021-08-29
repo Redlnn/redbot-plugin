@@ -11,12 +11,16 @@ from PIL import Image, ImageDraw, ImageFont
 from .config import read_cfg
 from .info import MODULE_NAME
 
+__all__ = [
+    "generate_img"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 
 cfg = read_cfg()
 
 
-def __get_text_config() -> dict:
+def _get_text_config() -> dict:
     """
     获取正文配置
     """
@@ -56,7 +60,7 @@ def __get_text_config() -> dict:
     return text_config
 
 
-def __get_background_config() -> dict:
+def _get_background_config() -> dict:
     """
     获取背景配置
     """
@@ -91,7 +95,7 @@ def __get_background_config() -> dict:
     return background_config
 
 
-def __get_time(mode: int = 1) -> str:
+def _get_time(mode: int = 1) -> str:
     """
     返回当前时间
     """
@@ -104,7 +108,7 @@ def __get_time(mode: int = 1) -> str:
     return dt
 
 
-def conver_line_to_list(text: str, char_per_line: int, line_width: int, font: ImageFont.FreeTypeFont, font_size):
+def _conver_line_to_list(text: str, char_per_line: int, line_width: int, font: ImageFont.FreeTypeFont, font_size):
     i = 0
     j = 0
     text_list = []
@@ -148,14 +152,14 @@ def conver_line_to_list(text: str, char_per_line: int, line_width: int, font: Im
     return text_list
 
 
-def conver_text_to_list(text: str, char_per_line: int, line_width: int, font: ImageFont.FreeTypeFont, font_size):
+def _conver_text_to_list(text: str, char_per_line: int, line_width: int, font: ImageFont.FreeTypeFont, font_size):
     text_list = text.splitlines(False)
     n_text_list = []
     for _ in text_list:
         if _ == '':
             n_text_list.append('')
         else:
-            n_text_list.extend(conver_line_to_list(_, char_per_line, line_width, font, font_size))
+            n_text_list.extend(_conver_line_to_list(_, char_per_line, line_width, font, font_size))
     return n_text_list
 
 
@@ -166,8 +170,8 @@ def generate_img(text: str = None) -> str:
     :param text: 文本
     :return: 图片文件的路径
     """
-    text_config = __get_text_config()
-    bg_config = __get_background_config()
+    text_config = _get_text_config()
+    bg_config = _get_background_config()
     if text_config['is_ttc_font']:
         font = ImageFont.truetype(text_config['ttf_path'], size=text_config['font_size'],
                                   index=text_config['ttc_font_index'])  # 确定正文用的ttf字体
@@ -181,14 +185,14 @@ def generate_img(text: str = None) -> str:
         extra_font = ImageFont.truetype(text_config['ttf_path'],
                                         size=text_config['font_size'] - int(0.3 * text_config['font_size']))
     extra_text1 = '由 Red_lnn 的 Bot 生成'  # 额外文本1
-    extra_text2 = __get_time()  # 额外文本2
+    extra_text2 = _get_time()  # 额外文本2
 
     font_size = font.getsize('一')  # 一个字符框的大小
     line_height = font_size[1]  # 行高
     line_height += text_config['line_space']  # 加入行距
     line_width = text_config['char_per_line'] * font_size[0]  # 行宽
 
-    text_list = conver_text_to_list(text, text_config['char_per_line'], line_width, font, text_config['font_size'])
+    text_list = _conver_text_to_list(text, text_config['char_per_line'], line_width, font, text_config['font_size'])
     lines = len(text_list)
 
     # 画布高度=((行高+行距)*行数)-行距+(2*正文边距)+(边框上边距+4*边框厚度+2*内外框距离+边框下边距)
@@ -303,7 +307,7 @@ def generate_img(text: str = None) -> str:
     elif os.path.isfile(temp_dir_path):  # 存在则判断temp是否为文件
         os.remove(temp_dir_path)  # 是文件则删掉后重新创建temp文件夹
         os.mkdir(temp_dir_path)
-    img_name = 'temp_{}.jpg'.format(__get_time(2))  # 自定义临时文件的保存名称
+    img_name = 'temp_{}.jpg'.format(_get_time(2))  # 自定义临时文件的保存名称
     img_path = os.path.join(temp_dir_path, img_name)  # 自定义临时文件保存路径
     # 保存为图片 https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html?highlight=subsampling#jpeg
     canvas.save(img_path, format='JPEG', quality=95, optimize=True, progressive=True, subsampling=1, qtables='web_high')
@@ -317,7 +321,3 @@ def generate_img(text: str = None) -> str:
 
 if __name__ == "__main__":
     pass
-
-__all__ = [
-    generate_img
-]

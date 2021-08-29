@@ -13,10 +13,14 @@ from mctools import PINGClient
 from .info import MODULE_NAME
 from .domain_resolver import domain_resolver, domain_resolver_srv
 
+__all__ = [
+    "ping_client"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 
 
-def is_domain(value: str) -> bool:
+def _is_domain(value: str) -> bool:
     """
     Return whether or not given value is a valid domain.
     If the value is valid domain name this function returns ``True``, otherwise False
@@ -31,12 +35,12 @@ def is_domain(value: str) -> bool:
     return True if pattern.match(value) else False
 
 
-def is_ip(host: str) -> bool:
+def _is_ip(host: str) -> bool:
     return True if regex.match(r'^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$',
                                host) else False
 
 
-def raw(text: bytes) -> str:
+def _raw(text: bytes) -> str:
     """
     Return a raw string representation of text
     将包含字符串的 byte 流转换为普通字符串，同时删除其中的终端控制符号
@@ -58,14 +62,14 @@ def ping_client(target: str):
     if len(target) > 2:
         return '参数错误，请检查你的输入'
     elif len(target) == 1:
-        if is_domain(target[0]):
+        if _is_domain(target[0]):
             # 如果目标为域名，则有可能是A记录（默认25565）或SRV记录
             target_server, target_port = domain_resolver_srv(target[0])
             if target_port is None:  # A记录
                 target_port = 25565
             else:  # SRV记录
                 target_port = int(target_port)
-        elif is_ip(target[0]):
+        elif _is_ip(target[0]):
             target_server = target[0]
             target_port = 25565
         else:
@@ -73,9 +77,9 @@ def ping_client(target: str):
     else:
         if not target[1].isdigit():
             return f'【{target[1]}】不是合法的端口号'
-        if is_domain(target[0]):
+        if _is_domain(target[0]):
             target_server = domain_resolver(target[0])
-        elif is_ip(target[0]):
+        elif _is_ip(target[0]):
             target_server = target[0]
         else:
             return f'【{target[0]}】不是合法的域名/IP地址'
@@ -90,7 +94,7 @@ def ping_client(target: str):
         ping = PINGClient(host=target_server, port=target_port, timeout=5)
         stats = ping.get_stats()
         ping.stop()
-        motd = regex.sub(r'[\\]x1b[[]([0-9_;]*)m', '', raw(stats['description']))
+        motd = regex.sub(r'[\\]x1b[[]([0-9_;]*)m', '', _raw(stats['description']))
     except ConnectionRefusedError:
         error_text = f'在尝试ping【{target_server}:{target_port}】时出错: ' \
                      '连接被目标拒绝，该地址和端口可能不存在Minecraft服务器'
@@ -125,6 +129,3 @@ def ping_client(target: str):
         'max_player': max_player,
         'player_list': player_list
     }
-
-
-__all__ = [ping_client]

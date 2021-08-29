@@ -15,6 +15,10 @@ from ..api import get_mc_id, is_mc_id, PermissionCheck
 from ..info import MODULE_NAME
 from ..rcon.rcon import execute_command
 
+__all__ = [
+    "del_whitelist", "del_whitelist_from_qq", "del_whitelist_from_id"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()
 
@@ -55,9 +59,9 @@ async def del_whitelist_from_qq(qq: int, app: GraiaMiraiApplication, message: Me
         else:
             try:
                 result = execute_command(f'whitelist remove {mc_id}')
-            except:  #noqa
+            except:  # noqa
                 await app.sendGroupMessage(group, MessageChain.create([
-                    Plain(f'从服务器删除id为【{mc_id_1}】的白名单时，服务器返回意料之外的内容：↓\n{result}')
+                    Plain(f'从服务器删除id为【{mc_id}】的白名单时出错：↓\n{traceback.format_exc()}')
                 ]), quote=message.get(Source).pop(0))  # noqa
                 return
             if result.startswith('Removed '):
@@ -97,9 +101,9 @@ async def del_whitelist_from_qq(qq: int, app: GraiaMiraiApplication, message: Me
         else:
             try:
                 result = execute_command(f'whitelist remove {mc_id_1}')
-            except:  #noqa
+            except:  # noqa
                 await app.sendGroupMessage(group, MessageChain.create([
-                    Plain(f'从服务器删除id为【{mc_id_1}】的白名单时，服务器返回意料之外的内容：↓\n{result}')
+                    Plain(f'从服务器删除id为【{mc_id_1}】的白名单时出错：↓\n{traceback.format_exc()}')
                 ]), quote=message.get(Source).pop(0))  # noqa
                 flag.append(False)
             else:
@@ -121,7 +125,7 @@ async def del_whitelist_from_qq(qq: int, app: GraiaMiraiApplication, message: Me
         else:
             try:
                 result = execute_command(f'whitelist remove {mc_id_2}')
-            except:  #noqa
+            except:  # noqa
                 await app.sendGroupMessage(group, MessageChain.create([
                     Plain(f'从服务器删除id为【{mc_id_2}】的白名单时，服务器返回意料之外的内容：↓\n{result}')
                 ]), quote=message.get(Source).pop(0))  # noqa

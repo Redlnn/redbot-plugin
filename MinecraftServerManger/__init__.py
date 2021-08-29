@@ -8,7 +8,7 @@ from graia.application.entry import (GraiaMiraiApplication, Group, Member, Messa
 from miraibot import GetCore
 from .api import PermissionCheck
 from .config import read_cfg
-from .info import MODULE_NAME
+from .info import (MODULE_NAME, MODULE_DESC)
 from .rcon.rcon import execute_command
 from .whitelist.utils import check_qq_had_id
 from .whitelist.wl_add import add_whitelist
@@ -18,6 +18,7 @@ from .whitelist.wl_info import whitelist_info
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME
+__plugin_usage__ = MODULE_DESC
 
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 

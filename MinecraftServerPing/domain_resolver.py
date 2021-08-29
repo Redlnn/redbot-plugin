@@ -9,6 +9,10 @@ from dns.resolver import NoAnswer, NXDOMAIN
 
 from .info import MODULE_NAME
 
+__all__ = [
+    "domain_resolver", "domain_resolver_srv"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 
 
@@ -48,6 +52,3 @@ def domain_resolver_srv(domain: str):
     elif nameserver_answer[0][0].rdtype in (RdataType.A, RdataType.AAAA):
         target_ip = nameserver_answer[0][0].address
         return target_ip, None
-
-
-__all__ = [domain_resolver, domain_resolver_srv]

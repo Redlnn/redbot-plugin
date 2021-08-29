@@ -15,6 +15,10 @@ from .db import execute_query_sql
 from ..api import get_mc_id, get_uuid, is_mc_id
 from ..info import MODULE_NAME
 
+__all__ = [
+    "whitelist_info"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()
 
@@ -71,7 +75,7 @@ async def query_qq_by_id(mc_id: str, app: GraiaMiraiApplication, group: Group, m
     return res[0]
 
 
-async def query_wl_by_qq(qq: int, app: GraiaMiraiApplication, group: Group, message: MessageChain, **kwargs):
+async def _query_wl_by_qq(qq: int, app: GraiaMiraiApplication, group: Group, message: MessageChain, **kwargs):
     query_sql = f'select main_uuid,main_add_time,alt_uuid,alt_add_time from {cfg["table"]} where qq={qq};'
     try:
         res = execute_query_sql(query_sql)
@@ -131,10 +135,10 @@ async def query_wl_by_qq(qq: int, app: GraiaMiraiApplication, group: Group, mess
         ]), quote=message.get(Source).pop(0))  # noqa
 
 
-async def query_wl_by_id(mc_id: str, app: GraiaMiraiApplication, group: Group, message: MessageChain, **kwargs):
+async def _query_wl_by_id(mc_id: str, app: GraiaMiraiApplication, group: Group, message: MessageChain, **kwargs):
     res_qq = await query_qq_by_id(mc_id, app, group, message)
     if res_qq is not None:
-        await query_wl_by_qq(res_qq, app, group, message)
+        await _query_wl_by_qq(res_qq, app, group, message)
 
 
 async def whitelist_info(*args, message: MessageChain, **kwargs):
@@ -143,19 +147,19 @@ async def whitelist_info(*args, message: MessageChain, **kwargs):
         return
     elif args_len == 3:
         if message.has(At):  # noqa
-            await query_wl_by_qq(qq=message.get(At)[0].dict()['target'], message=message, **kwargs)  # noqa
+            await _query_wl_by_qq(qq=message.get(At)[0].dict()['target'], message=message, **kwargs)  # noqa
             return 0
         else:
-            await query_wl_by_id(args[2], message=message, **kwargs)
+            await _query_wl_by_id(args[2], message=message, **kwargs)
             return 0
     elif args_len == 4:
         if args[2].lower() == 'qq':
             if message.has(At):  # noqa
-                await query_wl_by_qq(qq=message.get(At)[0].dict()['target'], message=message, **kwargs)  # noqa
+                await _query_wl_by_qq(qq=message.get(At)[0].dict()['target'], message=message, **kwargs)  # noqa
                 return 0
             elif args[3].isdigit():
-                await query_wl_by_qq(qq=int(args[3]), message=message, **kwargs)
+                await _query_wl_by_qq(qq=int(args[3]), message=message, **kwargs)
                 return 0
         elif args[2].lower() == 'id':
-            await query_wl_by_id(args[3], message=message, **kwargs)
+            await _query_wl_by_id(args[3], message=message, **kwargs)
             return 0

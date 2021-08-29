@@ -13,6 +13,10 @@ from pymysql.cursors import Cursor
 from .config import read_cfg
 from ..info import MODULE_NAME
 
+__all__ = [
+    "execute_query_sql", "execute_update_sql"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()
 
@@ -97,6 +101,3 @@ def execute_update_sql(sql_command: str):
         cur.close()
         conn.commit()
         conn.close()
-
-
-__all__ = [execute_query_sql, execute_update_sql]

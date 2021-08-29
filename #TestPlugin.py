@@ -13,12 +13,13 @@ from graia.application.entry import (GraiaMiraiApplication, Group, Friend, Messa
 from miraibot import GetCore
 
 MODULE_NAME = '测试插件'
-MODULE_DESC = ''
+MODULE_DESC = '测试'
 MODULE_AUTHOR = 'Red_lnn'
 MODULE_AUTHOR_CONTACT = 'https://github.com/Redlnn'
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME
+__plugin_usage__ = MODULE_DESC
 
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 

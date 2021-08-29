@@ -24,6 +24,7 @@ MODULE_AUTHOR_CONTACT = 'https://github.com/Redlnn'
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME
+__plugin_usage__ = MODULE_DESC
 
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 

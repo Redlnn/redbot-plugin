@@ -16,11 +16,15 @@ from ..api import get_uuid, is_mc_id, get_time, PermissionCheck, LengthCheck
 from ..info import MODULE_NAME
 from ..rcon.rcon import execute_command
 
+__all__ = [
+    "add_whitelist", "add_whitelist_to_qq"
+]
+
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 cfg = read_cfg()
 
 
-async def check_id_in_use(
+async def _check_id_in_use(
         uuid: str, app: GraiaMiraiApplication, message: MessageChain, group: Group) -> Union[bool, int, None]:
     query_sql = f'select qq from {cfg["table"]} where main_uuid=\"{uuid}\" or alt_uuid=\"{uuid}\";'
     try:
@@ -59,7 +63,7 @@ async def add_whitelist_to_qq(
         logger.error(f'向 mojang 查询【{mc_id}】的 uuid 时发生了意料之外的错误:  ↓\n{traceback.format_exc()}')
         return
 
-    use_status = await check_id_in_use(uuid, app, message, group)
+    use_status = await _check_id_in_use(uuid, app, message, group)
     if use_status is False:
         return
     elif type(use_status) == int:
@@ -147,6 +151,3 @@ async def add_whitelist(*args, message: MessageChain, **kwagrs):
     elif message.has(At):  # noqa
         await add_whitelist_to_qq(message.get(At)[0].dict()['target'], args[3], message=message, **kwagrs)  # noqa
         return 0
-
-
-__all__ = [add_whitelist]

@@ -9,20 +9,10 @@ import regex
 import requests
 from graia.application.entry import MemberPerm
 
-
-# class PrefixCheck:
-#     def __init__(self, prefix: str = None):
-#         self.prefix = prefix
-#
-#     def __call__(self, func):
-#         @wraps(func)
-#         def decorated(*args, **kwargs):
-#             if args[0] != self.prefix:
-#                 return None
-#             else:
-#                 return func(*args, **kwargs)
-#
-#         return decorated
+__all__ = [
+    "LengthCheck", "PermissionCheck",
+    "get_time", "is_mc_id", "is_uuid", "get_mc_id", "get_uuid"
+]
 
 
 class LengthCheck:

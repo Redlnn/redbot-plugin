@@ -9,10 +9,11 @@ from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain,
 from miraibot import GetCore
 from .config import read_cfg
 from .gen_img import generate_img
-from .info import MODULE_NAME
+from .info import (MODULE_NAME, MODULE_DESC)
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME
+__plugin_usage__ = MODULE_DESC
 
 logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 
