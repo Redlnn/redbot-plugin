@@ -4,7 +4,7 @@
 __提醒：请不要直接将本项目的任意代码/代码片段直接copy走，copy请在注释里写上作者与项目地址__
 
 ## 用法
-1. 进入 [redbot](https://github.com/Redlnn/redbot) 项目根目录，删除旧的 `plugins` 文件夹
+1. 进入 [redbot](https://github.com/Redlnn/redbot) 项目根目录，删除旧的 `plugins` 文件夹（请注意原有备份数据）
 2. `git clone git@github.com:Redlnn/redbot-plugin.git plugins`
 3. 进入 `plugins` 文件夹，使用 `pip install -r requirements.txt` 安装依赖
 4. 返回 `redbot` 文件夹并启动 `redbot`
