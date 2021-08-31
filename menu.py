@@ -30,7 +30,7 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group):
             continue
         if cmd == '!menu':
             continue
-        if active_group != group.id and active_group != 'null':
+        if active_group != str(group.id) and active_group != 'null':
             continue
         if target.Desc == 'null':
             msg_send += f'{cmd}\n'
