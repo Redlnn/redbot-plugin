@@ -4,12 +4,12 @@
 import logging
 import os
 
-from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Source, Image)
+from graia.application.entry import (GraiaMiraiApplication, Group, Image, MessageChain, Plain, Source)
 
 from miraibot import GetCore
 from plugins.Text2Img.gen_img import generate_img
 from .config import read_cfg
-from .info import (MODULE_NAME, MODULE_DESC)
+from .info import (MODULE_DESC, MODULE_NAME)
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME

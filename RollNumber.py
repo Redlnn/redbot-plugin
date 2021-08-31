@@ -14,6 +14,7 @@ from random import randint
 from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Source)
 
 from miraibot import GetCore
+from miraibot.command import group_command
 
 MODULE_NAME = '随机整数'
 MODULE_DESC = ''
@@ -21,6 +22,7 @@ MODULE_AUTHOR = 'Red_lnn'
 MODULE_AUTHOR_CONTACT = 'https://github.com/Redlnn'
 
 bcc = GetCore.bcc()
+bot = GetCore.bot()
 __plugin_name__ = __name__ = MODULE_NAME
 __plugin_usage__ = MODULE_DESC
 
@@ -31,15 +33,10 @@ logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 active_group = ()
 
 
-@bcc.receiver('GroupMessage')
+@group_command('!roll', ['！roll'], '获取 0-100 的随机数', group=active_group, shell_like=False)
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
-    if group.id not in active_group and active_group:
-        return None
-    cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
-    if len(cmd) == 0 or cmd[0] not in ('!', '！'):
-        return None
-
-    if cmd[1:4] == 'roll':
-        await app.sendGroupMessage(group, MessageChain(__root__=[
-            Plain(str(randint(0, 100)))
-        ]), quote=message.get(Source).pop(0))  # noqa
+    await app.sendGroupMessage(
+            group,
+            MessageChain.create([Plain(str(randint(0, 100)))]),
+            quote=message.get(Source).pop(0)  # noqa
+    )

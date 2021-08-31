@@ -13,9 +13,10 @@ from random import uniform
 from time import sleep
 from urllib.parse import quote
 
-from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Source, App)
+from graia.application.entry import (App, GraiaMiraiApplication, Group, MessageChain, Plain, Source)
 
 from miraibot import GetCore
+from miraibot.command import group_command
 
 MODULE_NAME = '我的世界中文Wiki搜索'
 MODULE_DESC = ''
@@ -33,17 +34,12 @@ logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 active_group = ()
 
 
-@bcc.receiver('GroupMessage')
+@group_command('!wiki', ['！wiki'], '搜索我的世界中文Wiki', group=active_group, )
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
         return None
-    cmd: str = message.asDisplay().strip()  # 如 "!BV1S64y1W7ej" 或 "!av762147945"
-    if len(cmd) == 0 or cmd[0] not in ('!', '！'):
-        return None
-    args: list = cmd[1:].strip().split(' ', 1)
+    args: list = message.asDisplay().strip()[1:].strip().split(' ', 1)
     if len(args) < 2:
-        return None
-    if args[0] != 'wiki':
         return None
     search_parm: str = quote(args[1], encoding='utf-8')
     bilibili_wiki_json = {

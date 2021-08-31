@@ -22,10 +22,11 @@ from xml.dom.minidom import parseString
 
 import regex
 import requests
-from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Image, App, Xml)
+from graia.application.entry import (App, GraiaMiraiApplication, Group, Image, MessageChain, Plain, Xml)
 from requests import get
 
 from miraibot import GetCore
+from miraibot.command import group_command
 
 MODULE_NAME = '获取B站视频信息'
 MODULE_DESC = '识别群内的B站链接、分享、av号、BV号并获取其对应的视频的信息'
@@ -71,12 +72,12 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
 
     video_info: dict = res_format['data']  # 若错误代码为0，则读取视频信息
 
-    video_cover_url: str = video_info['pic']   # 封面地址
-    video_bvid: str = video_info['bvid']       # BV号
-    video_avid: int = video_info['aid']        # av号
-    video_title: str = video_info['title']     # 视频标题
+    video_cover_url: str = video_info['pic']  # 封面地址
+    video_bvid: str = video_info['bvid']  # BV号
+    video_avid: int = video_info['aid']  # av号
+    video_title: str = video_info['title']  # 视频标题
     video_sub_num: int = video_info['videos']  # 视频分P数
-    video_pub_date: int = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(video_info['pubdate']))  # 视频发布时间(时间戳)
+    video_pub_date: str = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(video_info['pubdate']))  # 视频发布时间(时间戳)
     # video_unload_date: int = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(video_info['ctime']))  # 视频上传时间(时间戳)
     video_desc: str = video_info['desc']  # 视频简介
     video_duration_s: int = video_info['duration']  # 视频长度（单位：秒）
@@ -88,10 +89,10 @@ async def get_video_info(origin_id: str = None, app: GraiaMiraiApplication = Non
         video_length = f'{video_length_h}:{video_length_m}:{video_length_s}'
     # video_up_mid = video_info['owner']['mid']  # up主mid
     video_up_name: int = video_info['owner']['name']  # up主名称
-    video_view: int = video_info['stat']['view']      # 播放量
+    video_view: int = video_info['stat']['view']  # 播放量
     video_danmu: int = video_info['stat']['danmaku']  # 弹幕量
-    video_like: int = video_info['stat']['like']      # 点赞量
-    video_coin: int = video_info['stat']['coin']      # 投币量
+    video_like: int = video_info['stat']['like']  # 点赞量
+    video_coin: int = video_info['stat']['coin']  # 投币量
     video_favorite: int = video_info['stat']['favorite']  # 收藏量
 
     video_desc: str = video_desc.split('\n', 1)[0]  # 简介只取第一行，提前处理方便格式化
@@ -117,11 +118,21 @@ UP主：{video_up_name}
     return info_text, video_cover_url
 
 
+@group_command('!BV1xxx4y1x7xx', desc='获取指定BV号的视频信息')
+async def register_command_1():
+    pass
+
+
+@group_command('!avxxxxxx', desc='获取指定av号的视频信息')
+async def register_command_2():
+    pass
+
+
 @bcc.receiver('GroupMessage')
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     if group.id not in active_group and active_group:
         return None
-    origin_id = None
+    origin_id: str = None
     if message.has(App):  # noqa
         app_json = message.get(App)[0].content  # noqa
         app_dict = json.loads(app_json)
@@ -137,10 +148,8 @@ async def group_message_listener(app: GraiaMiraiApplication, group: Group, messa
 
         if int(app_id) == 1109937557:
             b23_url = app_dict['meta']['detail_1']['qqdocurl']
-            # b23_url = regex.match('^(http|https)://b23.tv/[0-9a-zA-Z]*', b23_url).group(0)
         elif int(app_id) == 1105517988:
             b23_url = app_dict['meta']['news']['jumpUrl']
-            # b23_url = regex.match('^(http|https)://b23.tv/[0-9a-zA-Z]*', b23_url).group(0)
         else:
             return None
         res = requests.get(b23_url, allow_redirects=False)

@@ -3,6 +3,7 @@
 
 import logging
 import traceback
+
 import dns.resolver
 from dns.rdatatype import RdataType
 from dns.resolver import NoAnswer, NXDOMAIN

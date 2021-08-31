@@ -5,10 +5,9 @@
 本插件为测试用插件，部署到生产环境时请记得删除或禁用
 """
 
-
 import logging
 
-from graia.application.entry import (GraiaMiraiApplication, Group, Friend, MessageChain, Plain, App)  # noqa
+from graia.application.entry import (App, Friend, GraiaMiraiApplication, Group, MessageChain, Plain)  # noqa
 
 from miraibot import GetCore
 

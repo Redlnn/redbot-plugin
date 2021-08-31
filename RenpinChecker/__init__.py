@@ -8,9 +8,10 @@ import os
 import random
 
 import yaml as yml
-from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Member, Plain, Source, At)
+from graia.application.entry import (At, GraiaMiraiApplication, Group, Member, MessageChain, Plain, Source)
 
 from miraibot import GetCore
+from miraibot.command import group_command
 
 MODULE_NAME = '人品测试'
 MODULE_DESC = '每个QQ号每天可随机获得一个0-100的整数（人品值），在当天内该值不会改变，该值会存放于一yml文件中，每日删除过期文件'
@@ -67,16 +68,12 @@ def read_data(date: str, qq: str) -> int:
             return random_int
 
 
-@bcc.receiver('GroupMessage')
+@group_command('!jrrp', ['！jrrp', '.jrrp', '#jrrp'], '你今天的人品如何？', group=active_group)  # jrrp 即 JinRiRenPin
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain, member: Member):
-    if group.id not in active_group and active_group:
-        return None
+    date_today = datetime.datetime.now().strftime('%Y-%m-%d')  # 获得今日日期
+    jrrp = read_data(date_today, str(member.id))
 
-    if message.asDisplay().lower() in ('.jrrp', '!jrrp'):  # 可用命令：.jrrp !jrrp ，即 JinRiRenPin
-        date_today = datetime.datetime.now().strftime('%Y-%m-%d')  # 获得今日日期
-        jrrp = read_data(date_today, str(member.id))
-
-        await app.sendGroupMessage(group, MessageChain.create([
-            At(member.id),
-            Plain(f' 今天的人品值是: {jrrp}')
-        ]), quote=message.get(Source).pop(0))  # noqa
+    await app.sendGroupMessage(group, MessageChain.create([
+        At(member.id),
+        Plain(f' 今天的人品值是: {jrrp}')
+    ]), quote=message.get(Source).pop(0))  # noqa

@@ -6,10 +6,10 @@ import logging
 from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain)
 
 from miraibot import GetCore
+from miraibot.command import group_command
 from .config import read_cfg
-from .info import (MODULE_NAME, MODULE_DESC)
+from .info import (MODULE_DESC, MODULE_NAME)
 from .ping import ping_client
-
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME
@@ -26,16 +26,9 @@ if active_group is None:
     active_group = ()
 
 
-@bcc.receiver('GroupMessage')
+@group_command('!ping', ['！ping'], '获取指定mc服务器的信息', group=active_group)
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
-    if group.id not in active_group and active_group:
-        return None
-    cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
-    if len(cmd) == 0 or cmd[0] not in ('!', '！'):
-        return None
-    args: list = cmd[1:].strip().split(' ')  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
-    if args[0] != 'ping':
-        return None
+    args: list = message.asDisplay().strip()[1:].strip().split(' ')  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
     if len(args) == 1:
         server_address = cfg['default_server']
     elif len(args) == 2:

@@ -2,16 +2,16 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import regex
-import traceback
-from requests.exceptions import Timeout, ReadTimeout, ConnectTimeout
-from urllib3.exceptions import TimeoutError
 import socket
+import traceback
 
+import regex
 from mctools import PINGClient
+from requests.exceptions import ConnectTimeout, ReadTimeout, Timeout
+from urllib3.exceptions import TimeoutError
 
-from .info import MODULE_NAME
 from .domain_resolver import domain_resolver, domain_resolver_srv
+from .info import MODULE_NAME
 
 __all__ = [
     "ping_client"
@@ -27,10 +27,10 @@ def _is_domain(value: str) -> bool:
     :param value: domain string to validate
     """
     pattern = regex.compile(
-        r'^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|'
-        r'([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|'
-        r'([a-zA-Z0-9][-_.a-zA-Z0-9]{0,61}[a-zA-Z0-9]))\.'
-        r'([a-zA-Z]{2,13}|[a-zA-Z0-9-]{2,30}.[a-zA-Z]{2,3})$'
+            r'^(([a-zA-Z]{1})|([a-zA-Z]{1}[a-zA-Z]{1})|'
+            r'([a-zA-Z]{1}[0-9]{1})|([0-9]{1}[a-zA-Z]{1})|'
+            r'([a-zA-Z0-9][-_.a-zA-Z0-9]{0,61}[a-zA-Z0-9]))\.'
+            r'([a-zA-Z]{2,13}|[a-zA-Z0-9-]{2,30}.[a-zA-Z]{2,3})$'
     )
     return True if pattern.match(value) else False
 

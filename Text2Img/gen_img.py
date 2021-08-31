@@ -114,7 +114,9 @@ def _conver_line_to_list(text: str, char_per_line: int, line_width: int, font: I
     text_list = []
     # re_ = '[a-zA-Z0-9]'
     start_symbol = ('[', '{', '<', '(', '【', '《', '（', '〈', '〖', '［', '〔', '“', '‘', '『', '「', '〝')
-    end_symbol = (',', '.', '!', '?', ';', ':', ']', '}', '>', ')', '%', '~', '…', '，', '。', '！,', '？', '；', '：', '】', '》', '）', '〉', '〗', '］', '〕', '”', '’', '～', '』', '」', '〞')
+    end_symbol = (
+    ',', '.', '!', '?', ';', ':', ']', '}', '>', ')', '%', '~', '…', '，', '。', '！,', '？', '；', '：', '】', '》', '）', '〉',
+    '〗', '］', '〕', '”', '’', '～', '』', '」', '〞')
     while True:
         tmp_text = text[i:i + char_per_line + j]
         size = font.getsize(tmp_text)
@@ -216,88 +218,98 @@ def generate_img(text: str = None) -> str:
     # 外框左上点坐标 x=边框侧边距 y=边框上边距
     # 外框右下点坐标 x=画布宽度-边框侧边距 y=画布高度-边框上边距
     draw.rectangle(
-        (
-            (bg_config['box_side_margin'], bg_config['box_top_margin']),
-            (bg_width - bg_config['box_side_margin'], bg_height - bg_config['box_bottom_margin'])
-        ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
+            (
+                (bg_config['box_side_margin'], bg_config['box_top_margin']),
+                (bg_width - bg_config['box_side_margin'], bg_height - bg_config['box_bottom_margin'])
+            ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
     # 绘制内框
     # 内框左上点坐标 x=边框侧边距+外边框厚度+内外框距离 y=边框上边距+外边框厚度+内外框距离
     # 内框右下点坐标 x=画布宽度-边框侧边距-外边框厚度-内外框距离 y=画布高度-边框上边距-外边框厚度-内外框距离
     draw.rectangle(
-        (
-            (bg_config['box_side_margin'] + bg_config['outline_width'] + bg_config['box_interval'],
-             bg_config['box_top_margin'] + bg_config['outline_width'] + bg_config['box_interval']),
-            (bg_width - bg_config['box_side_margin'] - bg_config['outline_width'] - bg_config['box_interval'],
-             bg_height - bg_config['box_bottom_margin'] - bg_config['outline_width'] - bg_config['box_interval'])
-        ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
+            (
+                (bg_config['box_side_margin'] + bg_config['outline_width'] + bg_config['box_interval'],
+                 bg_config['box_top_margin'] + bg_config['outline_width'] + bg_config['box_interval']),
+                (bg_width - bg_config['box_side_margin'] - bg_config['outline_width'] - bg_config['box_interval'],
+                 bg_height - bg_config['box_bottom_margin'] - bg_config['outline_width'] - bg_config['box_interval'])
+            ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
 
-    pil_compensation = bg_config['outline_width']-1 if bg_config['outline_width'] > 1 else 0
+    pil_compensation = bg_config['outline_width'] - 1 if bg_config['outline_width'] > 1 else 0
 
     # 绘制左上小方形
     # 左上点坐标 x=边框侧边距-边长-2*边框厚度+补偿 y=边框侧边距-边长-2*边框厚度+补偿 (补偿PIL绘图的错位)
     # 右下点坐标 x=边框侧边距+补偿 y=边框上边距+补偿
     draw.rectangle(
-        (
-            (bg_config['box_side_margin'] - bg_config['wrap_width'] - (2 * bg_config['outline_width']) + pil_compensation,  # noqa
-             bg_config['box_top_margin'] - bg_config['wrap_width'] - (2 * bg_config['outline_width']) + pil_compensation),  # noqa
-            (bg_config['box_side_margin'] + pil_compensation,
-             bg_config['box_top_margin'] + pil_compensation)
-        ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
+            (
+                (bg_config['box_side_margin'] - bg_config['wrap_width'] - (
+                            2 * bg_config['outline_width']) + pil_compensation,  # noqa
+                 bg_config['box_top_margin'] - bg_config['wrap_width'] - (
+                             2 * bg_config['outline_width']) + pil_compensation),  # noqa
+                (bg_config['box_side_margin'] + pil_compensation,
+                 bg_config['box_top_margin'] + pil_compensation)
+            ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
     # 绘制右上小方形
     # 左上点坐标 x=画布宽度-(边框侧边距+补偿) y=边框侧边距-边长-2*边框厚度+补偿 (补偿PIL绘图的错位)
     # 右下点坐标 x=画布宽度-(边框侧边距-边长-2*边框厚度+补偿) y=边框上边距+补偿
     draw.rectangle(
-        (
-            (bg_width - bg_config['box_side_margin'] - pil_compensation,
-             bg_config['box_top_margin'] - bg_config['wrap_width'] - (2 * bg_config['outline_width']) + pil_compensation),  # noqa
-            (bg_width - bg_config['box_side_margin'] + bg_config['wrap_width'] + (2 * bg_config['outline_width'] - pil_compensation),  # noqa
-             bg_config['box_top_margin'] + pil_compensation)
-        ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
+            (
+                (bg_width - bg_config['box_side_margin'] - pil_compensation,
+                 bg_config['box_top_margin'] - bg_config['wrap_width'] - (
+                             2 * bg_config['outline_width']) + pil_compensation),  # noqa
+                (bg_width - bg_config['box_side_margin'] + bg_config['wrap_width'] + (
+                            2 * bg_config['outline_width'] - pil_compensation),  # noqa
+                 bg_config['box_top_margin'] + pil_compensation)
+            ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
     # 绘制左下小方形
     # 左上点坐标 x=边框侧边距-边长-2*边框厚度+补偿 y=画布高度-(边框下边距+补偿) (补偿PIL绘图的错位)
     # 右下点坐标 x=边框侧边距+补偿 y=画布高度-(边框侧边距-边长-2*边框厚度+补偿)
     draw.rectangle(
-        (
-            (bg_config['box_side_margin'] - bg_config['wrap_width'] - (2 * bg_config['outline_width']) + pil_compensation,  # noqa
-             bg_height - bg_config['box_bottom_margin'] - pil_compensation),
-            (bg_config['box_side_margin'] + pil_compensation,
-             bg_height - bg_config['box_bottom_margin'] + bg_config['wrap_width'] + (2 * bg_config['outline_width']) - pil_compensation)  # noqa
-        ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
+            (
+                (bg_config['box_side_margin'] - bg_config['wrap_width'] - (
+                            2 * bg_config['outline_width']) + pil_compensation,  # noqa
+                 bg_height - bg_config['box_bottom_margin'] - pil_compensation),
+                (bg_config['box_side_margin'] + pil_compensation,
+                 bg_height - bg_config['box_bottom_margin'] + bg_config['wrap_width'] + (
+                             2 * bg_config['outline_width']) - pil_compensation)  # noqa
+            ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
     # 绘制右下小方形
     # 左上点坐标 x=画布宽度-(边框侧边距+补偿) y=画布高度-(边框下边距+补偿) (补偿PIL绘图的错位)
     # 右下点坐标 x=画布宽度-(边框侧边距-边长-2*边框厚度+补偿) y=画布高度-(边框侧边距-边长-2*边框厚度+补偿)
     draw.rectangle(
-        (
-            (bg_width - bg_config['box_side_margin'] - pil_compensation,
-             bg_height - bg_config['box_bottom_margin'] - pil_compensation),
-            (bg_width - bg_config['box_side_margin'] + bg_config['wrap_width'] + (2 * bg_config['outline_width'] - pil_compensation),  # noqa
-             bg_height - bg_config['box_bottom_margin'] + bg_config['wrap_width'] + (2 * bg_config['outline_width']) - pil_compensation)  # noqa
-        ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
+            (
+                (bg_width - bg_config['box_side_margin'] - pil_compensation,
+                 bg_height - bg_config['box_bottom_margin'] - pil_compensation),
+                (bg_width - bg_config['box_side_margin'] + bg_config['wrap_width'] + (
+                            2 * bg_config['outline_width'] - pil_compensation),  # noqa
+                 bg_height - bg_config['box_bottom_margin'] + bg_config['wrap_width'] + (
+                             2 * bg_config['outline_width']) - pil_compensation)  # noqa
+            ), fill=None, outline=bg_config['outline_color'], width=bg_config['outline_width'])
 
     # 绘制正文文字
     # 开始坐标 x=边框侧边距+2*边框厚度+内外框距离+正文侧边距 y=边框上边距+2*边框厚度+内外框距离+正文上边距+行号*(行高+行距)
     for _ in range(lines):
         draw.text(
-            (
-                bg_config['box_side_margin'] + (2 * bg_config['outline_width']) + bg_config['box_interval'] + text_config['margin'],  # noqa
-                bg_config['box_top_margin'] + (2 * bg_config['outline_width']) + bg_config['box_interval'] + text_config['margin'] + (_ * line_height)  # noqa
-            ), text_list[_], fill=text_config['font_color'], font=font)
+                (
+                    bg_config['box_side_margin'] + (2 * bg_config['outline_width']) + bg_config['box_interval'] +
+                    text_config['margin'],  # noqa
+                    bg_config['box_top_margin'] + (2 * bg_config['outline_width']) + bg_config['box_interval'] +
+                    text_config['margin'] + (_ * line_height)  # noqa
+                ), text_list[_], fill=text_config['font_color'], font=font)
 
     # 绘制第一行额外文字
     # 开始坐标 x=边框侧边距+(4*内外框距离) y=画布高度-边框下边距+(2*内外框距离)
     draw.text(
-        (
-            bg_config['box_side_margin'] + (4 * bg_config['box_interval']),
-            bg_height - bg_config['box_bottom_margin'] + (2 * bg_config['box_interval'])
-        ), extra_text1, fill='#b4a08e', font=extra_font)
+            (
+                bg_config['box_side_margin'] + (4 * bg_config['box_interval']),
+                bg_height - bg_config['box_bottom_margin'] + (2 * bg_config['box_interval'])
+            ), extra_text1, fill='#b4a08e', font=extra_font)
     # 绘制第二行额外文字
     # 开始坐标 x=边框侧边距+(4*内外框距离) y=画布高度-边框下边距+(3*内外框距离)+第一行额外文字的高度
     draw.text(
-        (
-            bg_config['box_side_margin'] + (4 * bg_config['box_interval']),
-            bg_height - bg_config['box_bottom_margin'] + (3 * bg_config['box_interval']) +
-            extra_font.getsize(extra_text1)[1]
-        ), extra_text2, fill='#b4a08e', font=extra_font)
+            (
+                bg_config['box_side_margin'] + (4 * bg_config['box_interval']),
+                bg_height - bg_config['box_bottom_margin'] + (3 * bg_config['box_interval']) +
+                extra_font.getsize(extra_text1)[1]
+            ), extra_text2, fill='#b4a08e', font=extra_font)
 
     canvas = canvas.convert(mode='RGB')  # 将RGBA转换为RGB以便保存为jpg
     # canvas.show()  # 展示生成结果

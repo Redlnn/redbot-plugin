@@ -4,12 +4,13 @@
 import logging
 import os
 
-from graia.application.entry import (GraiaMiraiApplication, Group, MessageChain, Plain, Image)
+from graia.application.entry import (GraiaMiraiApplication, Group, Image, MessageChain, Plain)
 
 from miraibot import GetCore
+from miraibot.command import group_command
 from .config import read_cfg
 from .gen_img import generate_img
-from .info import (MODULE_NAME, MODULE_DESC)
+from .info import (MODULE_DESC, MODULE_NAME)
 
 bcc = GetCore.bcc()
 __plugin_name__ = __name__ = MODULE_NAME
@@ -24,18 +25,11 @@ if active_group is None:
     active_group = ()
 
 
-@bcc.receiver('GroupMessage')
+@group_command('!img', ['！img'], '将文字转为图片', group=active_group)
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
-    if group.id not in active_group and active_group:
-        return None
-    cmd: str = message.asDisplay().strip()  # 如 "!test a bc 3 4d"
-    if len(cmd) == 0 or cmd[0] not in ('!', '！'):
-        return None
-    args: list = cmd[1:].strip().split(' ', 1)  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
-    if args[0] != 'img':
-        return None
+    args: list = message.asDisplay().strip()[1:].strip().split(' ', 1)  # 切割命令，结果为 ('test', 'a', 'bc', '3', '4d')
     if len(args) < 2:
-        return None
+        return
     img_path = generate_img(args[1])
     try:
         msg_id = await app.sendGroupMessage(group, MessageChain.create([
