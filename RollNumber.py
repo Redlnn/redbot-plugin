@@ -33,7 +33,7 @@ logger = logging.getLogger(f'MiraiBot.{MODULE_NAME}')
 active_group = ()
 
 
-@group_command('!roll', ['！roll'], '获取 0-100 的随机数', group=active_group, shell_like=False)
+@group_command('!roll', ['！roll'], '获取 0-100 的随机数', group=active_group)
 async def group_message_listener(app: GraiaMiraiApplication, group: Group, message: MessageChain):
     await app.sendGroupMessage(
             group,
