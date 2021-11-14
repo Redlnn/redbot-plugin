@@ -1,5 +1,7 @@
 # redbot-plugin
-一个用于放置 [redbot](https://github.com/Redlnn/redbot) 插件的仓库
+一个用于放置 [redbot](https://github.com/Redlnn/redbot/tree/old) 插件的仓库
+
+__redbot 已换框架，新版本跟插件共用一个仓库，本仓库仅作存档使用__
 
 __提醒：请不要直接将本项目的任意代码/代码片段直接copy走，copy请在注释里写上作者与项目地址__
 
